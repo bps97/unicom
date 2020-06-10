@@ -6,10 +6,10 @@ import Welcome from '../components/Welcome.vue'
 import Users from '../components/user/Users.vue'
 import Rights from '../components/power/Rights.vue'
 import Roles from '../components/power/Roles.vue'
-import Categories from '../components/goods/Cate.vue'
-import Params from '../components/goods/Params.vue'
-import Goods from '../components/goods/List.vue'
-import GoodsAdd from '../components/goods/Add.vue'
+import Categories from '../components/materials/Category.vue'
+import Params from '../components/materials/Params.vue'
+import Goods from '../components/materials/List.vue'
+import GoodsAdd from '../components/materials/Add.vue'
 
 // 导入Login组件
 
@@ -30,8 +30,8 @@ const router = new VueRouter({
         { path: '/roles', component: Roles },
         { path: '/categories', component: Categories },
         { path: '/params', component: Params },
-        { path: '/goods', component: Goods },
-        { path: '/goods/add', component: GoodsAdd }
+        { path: '/materials', component: Goods },
+        { path: '/materials/add', component: GoodsAdd }
       ]
     }
   ]

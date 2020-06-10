@@ -7,21 +7,43 @@
              alt="">
         <span>仓管系统</span>
       </div>
-      <el-button type="info"
-                 @click="logout">退出</el-button>
+      <!-- <el-button type="info"
+                 @click="logout">退出</el-button> -->
+
+      <el-menu class="el-menu-demo"
+               mode="horizontal"
+               background-color="#333854"
+               text-color="#fff"
+               active-text-color="#ffd04b">
+        <el-submenu index="1">
+          <template slot="title">账户</template>
+          <el-menu-item index="2-1"
+                        @click="logout">退出
+          </el-menu-item>
+          <!-- <el-menu-item index="2-2">选项2</el-menu-item>
+          <el-menu-item index="2-3">选项3</el-menu-item>
+          <el-submenu index="2-4">
+            <template slot="title">选项4</template>
+            <el-menu-item index="2-4-1">选项1</el-menu-item>
+            <el-menu-item index="2-4-2">选项2</el-menu-item>
+            <el-menu-item index="2-4-3">选项3</el-menu-item>
+          </el-submenu> -->
+        </el-submenu>
+        <el-menu-item index="2"><a href="http://www.10010.com/"
+             target="_blank">关于我们</a></el-menu-item>
+      </el-menu>
     </el-header>
     <!-- 页面主体区域 -->
     <el-container>
       <!-- 侧边栏 -->
       <el-aside :width="isCollapse ? '64px' : '200px'">
         <div class="toggle-button"
-             @click="toggleCollapse">|||</div>
+             style="font-size:20px"
+             @click="toggleCollapse"><i class="el-icon-s-unfold"></i></div>
         <!-- 侧边栏菜单区域 -->
         <!--unique-opened 展开唯一一项子菜单-->
         <!--:collapse=ture表示折叠-->
-        <el-menu background-color="#333744"
-                 text-color="#fff"
-                 active-text-color="#409EFF"
+        <el-menu active-text-color="#409EFF"
                  unique-opened
                  :collapse="isCollapse"
                  :collapse-transition="false"
@@ -73,11 +95,11 @@ export default {
       menulist: [],
       // 自定义图表
       iconsObj: {
-        '7829b530990f11eabc3c00ff': 'iconfont icon-user',
-        '0886180d999e11eabc3b00ff': 'iconfont icon-tijikongjian',
-        '3e440abf999e11eabc3b00ff': 'iconfont icon-shangpin',
-        '1b2d5794999e11eabc3b00ff': 'iconfont icon-danju',
-        '06cdb94c999f11eabc3b00ff': 'iconfont icon-baobiao'
+        '1270245105376067585': 'iconfont icon-user',
+        '1270245436524851202': 'iconfont icon-tijikongjian',
+        '1270271513129332737': 'iconfont icon-shangpin',
+        '1270248374752120834': 'iconfont icon-danju',
+        '1270248374739537921': 'iconfont icon-baobiao'
       },
       // 是否折叠
       isCollapse: false,
@@ -104,12 +126,12 @@ export default {
     // 点击按钮，切换菜单的折叠与展开
     toggleCollapse() {
       this.isCollapse = !this.isCollapse
-    }
+    },
     // 保存链接的激活状态
-    // saveNavState(activePath) {
-    //   window.sessionStorage.setItem('activePath', activePath)
-    //   this.activePath = activePath
-    // }
+    saveNavState(activePath) {
+      window.sessionStorage.setItem('activePath', activePath)
+      this.activePath = activePath
+    }
   }
 }
 </script>
@@ -119,31 +141,38 @@ export default {
   height: 100%;
 }
 .el-header {
-  background-color: #373d41;
+  background-color: #333854;
   display: flex;
   justify-content: space-between;
-  padding-left: 0;
+  // padding: 0 224px;
   align-items: center;
   color: #fff;
   font-size: 20px;
   > div {
     display: flex;
     align-items: center;
+
     span {
       margin-left: 15px;
     }
   }
+  .el-menu {
+    background-color: #fff;
+  }
 }
 
 .el-aside {
-  background-color: #333744;
+  background-color: #fff;
+  border: 1px #dfe1e6 solid;
   .el-menu {
     border-right: none;
+    color: #252b3a;
   }
 }
 
 .el-main {
-  background-color: #eaedf1;
+  // 主要内容区
+  background-color: #eef0f5;
 }
 
 // 间距十像素
@@ -152,10 +181,10 @@ export default {
 }
 
 .toggle-button {
-  background-color: #4a5064;
+  background-color: #fff;
   font-size: 10px;
   line-height: 24px;
-  color: #fff;
+  color: #252b3a;
   text-align: center;
   letter-spacing: 0.2em;
   cursor: pointer;

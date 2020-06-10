@@ -3,8 +3,8 @@
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>商品管理</el-breadcrumb-item>
-      <el-breadcrumb-item>商品列表</el-breadcrumb-item>
+      <el-breadcrumb-item>物料管理</el-breadcrumb-item>
+      <el-breadcrumb-item>物料列表</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- 卡片视图区域 -->
@@ -12,18 +12,17 @@
 
       <el-row :gutter="20">
         <!-- 选择商品分类区域 -->
-        <el-col :span='4'>
-          <el-select v-model="selectValue"
-                     placeholder="全部"
-                     clearable
-                     @change='changeOption'>
-            <el-option v-for="item in catelist"
-                       :key="item.id"
-                       :value="item.name">
-            </el-option>
-          </el-select>
+        <el-col :span='5'>
+          <el-cascader expand-trigger="hover"
+                       :options="parentcateList"
+                       :props="cascaderProps"
+                       v-model="selectedKeys"
+                       @change="parentCateChanged"
+                       clearable
+                       change-on-select>
+          </el-cascader>
         </el-col>
-        <el-col :span="8">
+        <el-col :span="6">
           <el-input placeholder="请输入内容"
                     v-model="queryInfo.key"
                     clearable
@@ -35,7 +34,7 @@
         </el-col>
         <el-col :span="4">
           <el-button type="primary"
-                     @click="goAddpage">添加商品</el-button>
+                     @click="goAddpage">添加物料</el-button>
         </el-col>
       </el-row>
       <br>
@@ -44,21 +43,20 @@
                 border
                 stripe>
         <el-table-column type="index"></el-table-column>
-        <el-table-column label="商品名称"
+        <el-table-column label="物料名称"
                          prop="name"></el-table-column>
-        <el-table-column label="商品价格(元)"
-                         prop="price"
+        <el-table-column label="专业线"
+                         prop="specialLine"
                          width="95px"></el-table-column>
-        <el-table-column label="商品重量"
-                         prop="goods_weight"
+        <el-table-column label="仓库"
+                         prop="repositoryName"
+                         width="95px"></el-table-column>
+        <el-table-column label="物料数量"
+                         prop="count"
                          width="70px"></el-table-column>
-        <el-table-column label="创建时间"
-                         prop="add_time"
-                         width="140px">
-          <template slot-scope="scope">
-            {{scope.row.add_time | dateFormat}}
-          </template>
-        </el-table-column>
+        <el-table-column label="更新时间"
+                         prop="updateTime"
+                         width="160px"></el-table-column>
         <el-table-column label="操作"
                          width="130px">
           <template slot-scope="scope">
@@ -96,35 +94,35 @@ export default {
         key: '',
         page: 1,
         size: 10,
-        categoryName: ''
+        categoryId: ''
       },
       // 分类列表
       catelist: [],
-      selectValue: '',
       // 商品列表
       goodslist: [],
       // 总数据条数
-      total: 0
+      total: 0,
+      // 父级分类的列表
+      parentcateList: [],
+      // 指定级联选择器的配置对象
+      cascaderProps: {
+        value: 'id',
+        label: 'name',
+        children: 'children'
+      },
+      // 选中的父级分类的Id数组
+      selectedKeys: []
     }
   },
   created() {
-    this.getGoodsList()
-    this.getCateList()
     console.log(this)
+    // 先获取父级分类的数据列表
+    this.getParentcateList()
   },
   methods: {
-    // 获取所有的商品分类列表
-    async getCateList() {
-      const { data: res } = await this.$http.get('categories')
-      if (res.meta.status !== 200) {
-        return this.$message.error('获取商品分类失败！')
-      }
-
-      this.catelist = res.data
-    },
     // 根据分页获取对应的商品列表
     async getGoodsList() {
-      const { data: res } = await this.$http.get('goods', {
+      const { data: res } = await this.$http.get('material', {
         params: this.queryInfo
       })
 
@@ -134,11 +132,7 @@ export default {
 
       this.$message.success('获取商品列表成功！')
       this.goodslist = res.data.content
-      this.total = res.data.totalElements
-    },
-    changeOption() {
-      this.queryInfo.categoryName = this.selectValue
-      this.getGoodsList()
+      this.total = res.data.total
     },
     handleSizeChange(newSize) {
       this.queryInfo.size = newSize
@@ -173,7 +167,27 @@ export default {
       this.getGoodsList()
     },
     goAddpage() {
-      this.$router.push('/goods/add')
+      this.$router.push('/materials/add')
+    },
+    // 选择项发生变化触发这个函数
+    parentCateChanged() {
+      // console.log(this.selectedKeys)
+      if (this.selectedKeys !== undefined && this.selectedKeys.length > 1) {
+        this.queryInfo.categoryId = this.selectedKeys[
+          this.selectedKeys.length - 1
+        ]
+        this.getGoodsList()
+      }
+    },
+    async getParentcateList() {
+      const { data: res } = await this.$http.get('category/menus', {})
+
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取父级分类数据失败！')
+      }
+
+      console.log(res.data)
+      this.parentcateList = res.data
     }
   }
 }

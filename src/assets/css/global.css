@@ -7,9 +7,9 @@ body,
 }
 
 
-.el-breadcrubm{
-  margin-bottom: 15px;
+.el-breadcrumb{
   font-size: 12px;
+  margin-bottom: 15px;
 }
 
 .el-card{
