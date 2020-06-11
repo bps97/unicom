@@ -19,11 +19,10 @@
       <!-- tab 页签区域 -->
       <el-tabs v-model="activeName"
                @tab-click="shiftTabs">
-        <el-tab-pane label="消耗型物料"
-                     name="consumptive">
-        </el-tab-pane>
-        <el-tab-pane label="设备"
-                     name="equipment">
+        <el-tab-pane v-for='item in cateData'
+                     :key='item.id'
+                     :label='item.name'
+                     :name='item.id'>
         </el-tab-pane>
         <!-- 表格 -->
         <tree-table class="treeTable"
@@ -38,12 +37,9 @@
           <!-- 是否有效 -->
           <template slot="isok"
                     slot-scope="scope">
-            <i class="el-icon-success"
-               v-if="scope.row.available === true"
-               style="color: lightgreen;"></i>
-            <i class="el-icon-error"
-               v-else
-               style="color: red;"></i>
+            <el-switch v-model="scope.row.available"
+                       @change="categoryStateChanged(scope.row)">
+            </el-switch>
           </template>
           <!-- 排序 -->
           <template slot="order"
@@ -58,13 +54,16 @@
                     v-else>三级</el-tag>
           </template>
           <!-- 操作 -->
-          <template slot="opt">
+          <template slot="opt"
+                    slot-scope="scope">
             <el-button type="primary"
                        icon="el-icon-edit"
-                       size="mini">编辑</el-button>
+                       size="mini"
+                       @click="showEditDialog(scope.row.id)">编辑</el-button>
             <el-button type="danger"
                        icon="el-icon-delete"
-                       size="mini">删除</el-button>
+                       size="mini"
+                       @click="removeUserById(scope.row.id)">删除</el-button>
           </template>
         </tree-table>
 
@@ -79,6 +78,35 @@
         </el-pagination>
       </el-tabs>
     </el-card>
+
+    <!-- 修改用户的对话框 -->
+    <el-dialog title="修改分类"
+               :visible.sync="editDialogVisible"
+               width="50%"
+               @close="editDialogClosed">
+      <el-form :model="editForm"
+               ref="editFormRef"
+               label-width="70px">
+        <el-form-item label="名称">
+          <el-input v-model="editForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="专业线"
+                      prop="specialLine">
+          <el-input v-model="editForm.specialLine"></el-input>
+        </el-form-item>
+        <el-form-item label="等级"
+                      prop="level">
+          <el-input v-model="editForm.level"
+                    disabled></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer"
+            class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary"
+                   @click="editUserInfo">确 定</el-button>
+      </span>
+    </el-dialog>
 
     <!-- 添加分类的对话框 -->
     <el-dialog title="添加分类"
@@ -123,11 +151,11 @@ export default {
     return {
       // 查询条件
       querInfo: {
-        level: 3,
+        level: '',
         page: 1,
         size: 5
       },
-      activeName: 'consumptive',
+      activeName: '无线',
       // 商品分类的数据列表，默认为空
       cateList: [],
       // 总的数据
@@ -190,20 +218,34 @@ export default {
         children: 'children'
       },
       // 选中的父级分类的Id数组
-      selectedKeys: []
+      selectedKeys: [],
+      // 控制修改用户对话框的显示与隐藏
+      editDialogVisible: false,
+      // 查询到的用户信息对象
+      editForm: {}
     }
   },
   created() {
     this.getcateList()
   },
   methods: {
+    // 监听 switch 开关状态的改变
+    async categoryStateChanged(user) {
+      const { data: res } = await this.$http.put(
+        `category/${user.id}/available/${user.available}`
+      )
+      if (res.meta.status !== 200) {
+        user.available = !user.available
+        return this.$message.error('更新分类有效性失败！')
+      }
+      this.$message.success('更新分类有效性成功！')
+    },
     // 切换标签
     shiftTabs() {
-      if (this.activeName === 'consumptive') {
-        this.cateList = this.cateData[0].children
-      } else {
-        this.cateList = this.cateData[1].children
-      }
+      // console.log(this.activeName)
+      // this.cateData.forEach(item => console.log(item.id))
+      var temp = this.cateData.filter(item => item.id === this.activeName)[0]
+      this.cateList = temp.children != null ? temp.children : []
       this.total = this.cateList.length
     },
 
@@ -295,6 +337,77 @@ export default {
       this.selectedKeys = []
       this.addCateForm.level = 0
       this.addCateForm.parent_id = 0
+    },
+    // 展示编辑用户的对话框
+    async showEditDialog(id) {
+      // console.log(id)
+      const { data: res } = await this.$http.get('category/' + id)
+
+      if (res.meta.status !== 200) {
+        return this.$message.error('查询分类信息失败！')
+      }
+
+      this.editForm = res.data
+      this.editDialogVisible = true
+    },
+    // 监听修改用户对话框的关闭事件
+    editDialogClosed() {
+      this.$refs.editFormRef.resetFields()
+    },
+    // 修改用户信息并提交
+    editUserInfo() {
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) return
+        // 发起修改用户信息的数据请求
+        const { data: res } = await this.$http.put(
+          'account/' + this.editForm.id,
+          {
+            name: this.editForm.name,
+            email: this.editForm.email,
+            mobile: this.editForm.mobile
+          }
+        )
+
+        if (res.meta.status !== 200) {
+          return this.$message.error('更新用户信息失败！')
+        }
+
+        // 关闭对话框
+        this.editDialogVisible = false
+        // 刷新数据列表
+        this.getuserList()
+        // 提示修改成功
+        this.$message.success('更新用户信息成功！')
+      })
+    },
+    // 根据Id删除对应的用户信息
+    async removeUserById(id) {
+      // 弹框询问用户是否删除数据
+      const confirmResult = await this.$confirm(
+        '此操作将永久删除该用户, 是否继续?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).catch(err => err)
+
+      // 如果用户确认删除，则返回值为字符串 confirm
+      // 如果用户取消了删除，则返回值为字符串 cancel
+      // console.log(confirmResult)
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('已取消删除')
+      }
+
+      const { data: res } = await this.$http.delete('account/' + id)
+
+      if (res.meta.status !== 200) {
+        return this.$message.error('删除用户失败！')
+      }
+
+      this.$message.success('删除用户成功！')
+      this.getuserList()
     }
   }
 }

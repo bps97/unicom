@@ -32,14 +32,16 @@
                 border
                 stripe>
         <el-table-column type="index"></el-table-column>
-        <el-table-column label="姓名"
+        <el-table-column label="登录"
                          prop="username"></el-table-column>
+        <el-table-column label="姓名"
+                         prop="name"></el-table-column>
         <el-table-column label="邮箱"
                          prop="email"></el-table-column>
         <el-table-column label="电话"
                          prop="mobile"></el-table-column>
-        <el-table-column label="角色"
-                         prop="role_name"></el-table-column>
+        <!-- <el-table-column label="角色"
+                         prop="role_name"></el-table-column> -->
         <el-table-column label="状态">
           <template slot-scope="scope">
             <el-switch v-model="scope.row.available"
@@ -103,13 +105,9 @@
                       prop="password">
           <el-input v-model="addForm.password"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱"
-                      prop="email">
-          <el-input v-model="addForm.email"></el-input>
-        </el-form-item>
-        <el-form-item label="手机"
-                      prop="mobile">
-          <el-input v-model="addForm.mobile"></el-input>
+        <el-form-item label="姓名"
+                      prop="name">
+          <el-input v-model="addForm.name"></el-input>
         </el-form-item>
       </el-form>
       <!-- 底部区域 -->
@@ -133,6 +131,9 @@
         <el-form-item label="用户名">
           <el-input v-model="editForm.username"
                     disabled></el-input>
+        </el-form-item>
+        <el-form-item label="姓名">
+          <el-input v-model="editForm.name"></el-input>
         </el-form-item>
         <el-form-item label="邮箱"
                       prop="email">
@@ -225,8 +226,7 @@ export default {
       addForm: {
         username: '',
         password: '',
-        email: '',
-        mobile: ''
+        name: ''
       },
       // 添加表单的验证规则对象
       addFormRules: {
@@ -330,7 +330,7 @@ export default {
       this.$refs.addFormRef.validate(async valid => {
         if (!valid) return
         // 可以发起添加用户的网络请求
-        const { data: res } = await this.$http.post('users', this.addForm)
+        const { data: res } = await this.$http.post('account', this.addForm)
 
         if (res.meta.status !== 201) {
           this.$message.error('添加用户失败！')
@@ -365,8 +365,9 @@ export default {
         if (!valid) return
         // 发起修改用户信息的数据请求
         const { data: res } = await this.$http.put(
-          'users/' + this.editForm.id,
+          'account/' + this.editForm.id,
           {
+            name: this.editForm.name,
             email: this.editForm.email,
             mobile: this.editForm.mobile
           }
