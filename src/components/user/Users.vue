@@ -15,10 +15,10 @@
           <el-input placeholder="请输入内容"
                     v-model="queryInfo.key"
                     clearable
-                    @clear="getUserList">
+                    @clear="getuserList">
             <el-button slot="append"
                        icon="el-icon-search"
-                       @click="getUserList"></el-button>
+                       @click="getuserList"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
@@ -28,21 +28,22 @@
       </el-row>
 
       <!-- 用户列表区域 -->
-      <el-table :data="userlist"
+      <el-table :data="userList"
                 border
                 stripe>
         <el-table-column type="index"></el-table-column>
-        <el-table-column label="昵称"
-                         prop="nickname"></el-table-column>
+        <el-table-column label="姓名"
+                         prop="username"></el-table-column>
         <el-table-column label="邮箱"
                          prop="email"></el-table-column>
         <el-table-column label="电话"
                          prop="mobile"></el-table-column>
+        <el-table-column label="角色"
+                         prop="role_name"></el-table-column>
         <el-table-column label="状态">
-          <template v-slot:default='scope'>
-            <!-- 作用域插槽 -->
+          <template slot-scope="scope">
             <el-switch v-model="scope.row.available"
-                       @change="userAvailableChanged(scope.row)">
+                       @change="userStateChanged(scope.row)">
             </el-switch>
           </template>
         </el-table-column>
@@ -119,6 +120,7 @@
                    @click="addUser">确 定</el-button>
       </span>
     </el-dialog>
+
     <!-- 修改用户的对话框 -->
     <el-dialog title="修改用户"
                :visible.sync="editDialogVisible"
@@ -162,7 +164,7 @@
                      placeholder="请选择">
             <el-option v-for="item in rolesList"
                        :key="item.id"
-                       :label="item.authName"
+                       :label="item.roleName"
                        :value="item.id">
             </el-option>
           </el-select>
@@ -175,7 +177,6 @@
                    @click="saveRoleInfo">确 定</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 
@@ -216,7 +217,7 @@ export default {
         // 当前每页显示多少条数据
         size: 2
       },
-      userlist: [],
+      userList: [],
       total: 0,
       // 控制添加用户对话框的显示与隐藏
       addDialogVisible: false,
@@ -282,37 +283,37 @@ export default {
     }
   },
   created() {
-    this.getUserList()
+    this.getuserList()
   },
   methods: {
-    async getUserList() {
-      const { data: res } = await this.$http.get('users', {
+    async getuserList() {
+      const { data: res } = await this.$http.get('account', {
         params: this.queryInfo
       })
       if (res.meta.status !== 200) {
         return this.$message.error('获取用户列表失败！')
       }
-      this.userlist = res.data.content
-      this.total = res.data.totalElements
-      // console.log(res)
+      this.userList = res.data.content
+      this.total = res.data.total
+      console.log(res)
     },
-    // 监听 pagesize 改变的事件
+    // 监听 size 改变的事件
     handleSizeChange(newSize) {
       // console.log(newSize)
       this.queryInfo.size = newSize
-      this.getUserList()
+      this.getuserList()
     },
     // 监听 页码值 改变的事件
     handleCurrentChange(newPage) {
       console.log(newPage)
       this.queryInfo.page = newPage
-      this.getUserList()
+      this.getuserList()
     },
     // 监听 switch 开关状态的改变
-    async userAvailableChanged(userinfo) {
+    async userStateChanged(userinfo) {
       console.log(userinfo)
       const { data: res } = await this.$http.put(
-        `users/${userinfo.id}/available/${userinfo.available}`
+        `account/${userinfo.id}/available/${userinfo.available}`
       )
       if (res.meta.status !== 200) {
         userinfo.available = !userinfo.available
@@ -329,7 +330,7 @@ export default {
       this.$refs.addFormRef.validate(async valid => {
         if (!valid) return
         // 可以发起添加用户的网络请求
-        const { data: res } = await this.$http.post('/users/reg', this.addForm)
+        const { data: res } = await this.$http.post('users', this.addForm)
 
         if (res.meta.status !== 201) {
           this.$message.error('添加用户失败！')
@@ -339,13 +340,13 @@ export default {
         // 隐藏添加用户的对话框
         this.addDialogVisible = false
         // 重新获取用户列表数据
-        this.getUserList()
+        this.getuserList()
       })
     },
     // 展示编辑用户的对话框
     async showEditDialog(id) {
-      console.log(id)
-      const { data: res } = await this.$http.get('users/' + id)
+      // console.log(id)
+      const { data: res } = await this.$http.get('account/' + id)
 
       if (res.meta.status !== 200) {
         return this.$message.error('查询用户信息失败！')
@@ -378,7 +379,7 @@ export default {
         // 关闭对话框
         this.editDialogVisible = false
         // 刷新数据列表
-        this.getUserList()
+        this.getuserList()
         // 提示修改成功
         this.$message.success('更新用户信息成功！')
       })
@@ -403,14 +404,14 @@ export default {
         return this.$message.info('已取消删除')
       }
 
-      const { data: res } = await this.$http.delete('users/' + id)
+      const { data: res } = await this.$http.delete('account/' + id)
 
       if (res.meta.status !== 200) {
         return this.$message.error('删除用户失败！')
       }
 
       this.$message.success('删除用户成功！')
-      this.getUserList()
+      this.getuserList()
     },
     // 展示分配角色的对话框
     async setRole(userInfo) {
@@ -444,7 +445,7 @@ export default {
       }
 
       this.$message.success('更新角色成功！')
-      this.getUserList()
+      this.getuserList()
       this.setRoleDialogVisible = false
     },
     // 监听分配角色对话框的关闭事件

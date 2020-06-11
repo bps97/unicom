@@ -3,11 +3,9 @@ import {
   Button, Form, FormItem, Input, Message, Container, Header, Aside, Main, Menu,
   Submenu, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col, Table, TableColumn,
   Switch, Tooltip, Pagination, Dialog, MessageBox, Tag, Cascader, Alert, Tabs, TabPane,
-  Steps, Step, CheckboxGroup, Checkbox, Upload, Select, Option
+  Steps, Step, CheckboxGroup, Checkbox, Upload, Select, Option, Timeline, TimelineItem,
+  Autocomplete, Slider
 } from 'element-ui'
-
-// import Timeline from './timeline/index.js'
-// import TimelineItem from './timeline-item/index.js'
 
 Vue.use(Button)
 Vue.use(Form)
@@ -43,7 +41,9 @@ Vue.use(Checkbox)
 Vue.use(Upload)
 Vue.use(Select)
 Vue.use(Option)
-// Vue.use(Timeline)
-// Vue.use(TimelineItem)
+Vue.use(Timeline)
+Vue.use(TimelineItem)
+Vue.use(Autocomplete)
+Vue.use(Slider)
 Vue.prototype.$message = Message // 全局挂载
 Vue.prototype.$confirm = MessageBox.confirm
