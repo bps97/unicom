@@ -5,7 +5,6 @@
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>审批流程</el-breadcrumb-item>
       <el-breadcrumb-item>日志录入</el-breadcrumb-item>
-      <el-breadcrumb-item></el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图区域 -->
     <el-card>
@@ -82,7 +81,8 @@ export default {
         materialId: '',
         message: '',
         count: 1,
-        repositoryId: ''
+        repositoryId: '',
+        categoryId: ''
       },
       queryInfo: {
         categoryId: ''
@@ -148,12 +148,13 @@ export default {
     onSubmit() {
       console.log(this.form)
       this.$refs.recordFormRef.validate(async valid => {
+        this.form.categoryId = this.queryInfo.categoryId
         if (!valid) return
         // 可以发起添加用户的网络请求
         const { data: res } = await this.$http.post('record', this.form)
 
         if (res.meta.status !== 201) {
-          this.$message.error('添加用户失败！')
+          this.$message.error('添加成功失败！')
         }
 
         this.$message.success('添加用户成功！')

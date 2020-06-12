@@ -12,7 +12,7 @@ import axios from 'axios'
 // 配置请求的根路径
 axios.defaults.baseURL = 'http://localhost:80/'
 axios.interceptors.request.use(config => {
-  config.headers.Authorizaion = window.sessionStorage.getItem('token')
+  config.headers.token = window.sessionStorage.getItem('token')
   // 请求拦截器
   return config
 })
