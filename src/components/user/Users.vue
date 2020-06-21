@@ -32,7 +32,7 @@
                 border
                 stripe>
         <el-table-column type="index"></el-table-column>
-        <el-table-column label="登录"
+        <el-table-column label="账号"
                          prop="username"></el-table-column>
         <el-table-column label="姓名"
                          prop="name"></el-table-column>
@@ -216,7 +216,7 @@ export default {
         // 当前的页数
         page: 1,
         // 当前每页显示多少条数据
-        size: 2
+        size: 5
       },
       userList: [],
       total: 0,
@@ -293,7 +293,7 @@ export default {
       if (res.meta.status !== 200) {
         return this.$message.error('获取用户列表失败！')
       }
-      this.userList = res.data.content
+      this.userList = res.data.records
       this.total = res.data.total
       console.log(res)
     },

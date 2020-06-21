@@ -19,3 +19,11 @@ body,
 .el-pagination{
   margin-top:10px
 }
+
+.el-steps{
+  margin: 15px 0px;
+}
+
+.el-step_title {
+  font-size: 13px;
+}
