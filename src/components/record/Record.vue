@@ -9,7 +9,7 @@
     <!-- 卡片视图区域 -->
     <el-card>
       <!-- 提示区域 -->
-      <el-alert title="添加商品信息"
+      <el-alert title="添加物料信息"
                 type="info"
                 center
                 show-icon
@@ -21,12 +21,12 @@
                 align-center>
         <el-step title="物料信息"></el-step>
         <el-step title="申请情况"></el-step>
-        <el-step title="最终结算"></el-step>
 
       </el-steps>
 
-      <el-form ref="recordFormRef"
-               :model="form"
+      <el-form ref="recordForm"
+               :model="recordForm"
+               :rules="recordFormRules"
                label-width="80px">
 
         <el-tabs v-model="activeIndex"
@@ -34,9 +34,9 @@
                  :before-leave="beforeTabLeave">
           <el-tab-pane label="物料信息"
                        name="0">
-
-            <el-form-item label="仓库位置">
-              <el-select v-model="form.repositoryId"
+            <el-form-item label="仓库位置"
+                          prop="repositoryId">
+              <el-select v-model="recordForm.repositoryId"
                          placeholder="请选择仓库">
                 <el-option v-for="item in repoList"
                            :key='item.key'
@@ -46,7 +46,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="物料分类">
-              <el-cascader expand-trigger="hover"
+              <el-cascader props.expandTrigger="hover"
                            :options="parentcateList"
                            :props="cascaderProps"
                            v-model="selectedKeys"
@@ -54,12 +54,13 @@
                            placeholder="请选择分类"
                            clearable
                            style="width:400px"
-                           change-on-select>
+                           props.checkStrictly>
               </el-cascader>
             </el-form-item>
-            <el-form-item label="物料名称">
+            <el-form-item label="物料名称"
+                          prop="materialName">
               <el-autocomplete class="inline-input"
-                               v-model="form.materialName"
+                               v-model="recordForm.materialName"
                                :fetch-suggestions="querySearch"
                                placeholder="请输入内容"
                                @select="handleSelect"
@@ -70,7 +71,7 @@
             </el-form-item>
             <el-form-item label="物料数量">
               <el-col :span='8'>
-                <el-slider v-model="form.count"
+                <el-slider v-model="recordForm.count"
                            :show-tooltip="false"
                            show-input>
                 </el-slider>
@@ -78,20 +79,20 @@
             </el-form-item>
 
             <el-form-item>
-              <el-button type="primary"
-                         @click="open">立即申请</el-button>
               <el-button type="success"
-                         @click="onSubmit">继续添加</el-button>
-              <el-button>取消</el-button>
+                         @click="onSubmit">添加</el-button>
+              <el-button type="primary"
+                         @click="nextStep">下一步</el-button>
+              <el-button @click="resetForm('recordForm')">清空</el-button>
             </el-form-item>
 
           </el-tab-pane>
           <el-tab-pane label="申请情况"
                        name="1">
             <!-- 申请单表 -->
-            <el-table :data="APPItems"
+            <el-table :data="applicationItems"
                       style="width: 100%"
-                      height="250">
+                      height="300">
               <el-table-column type="index"></el-table-column>
               <el-table-column prop="materialName"
                                label="物料名称">
@@ -117,7 +118,7 @@
                                label="操作"
                                width="120">
                 <template slot-scope="scope">
-                  <el-button @click.native.prevent="deleteRow(scope.$index, tableData)"
+                  <el-button @click.native.prevent="deleteRow(scope.$index, applicationItems)"
                              type="text"
                              size="small">
                     移除
@@ -125,26 +126,28 @@
                 </template>
               </el-table-column>
             </el-table>
-          </el-tab-pane>
-          <el-tab-pane label="最终结算"
-                       name="2">
+            <br>
             <el-form-item label="使用原因">
               <el-col :span="12">
                 <el-input type="textarea"
-                          v-model="form.message"></el-input>
+                          v-model="recordForm.message"></el-input>
               </el-col>
             </el-form-item>
             <el-form-item>
               <el-button type="primary"
-                         @click="submitApplication">立即申请</el-button>
-              <el-button type="success">继续添加</el-button>
-              <span slot="footer"
+                         @click="submitApplyForm">立即申请</el-button>
+              <el-button type="success"
+                         @click="preStep">继续添加</el-button>
+              <span slot="
+                         footer"
                     class="dialog-footer">
                 <el-button>取 消</el-button>
                 <el-button type="primary">确 定</el-button>
               </span>
             </el-form-item>
+
           </el-tab-pane>
+
         </el-tabs>
       </el-form>
     </el-card>
@@ -157,7 +160,7 @@ export default {
   data() {
     return {
       restaurants: [],
-      form: {
+      recordForm: {
         materialId: '',
         materialName: '',
         message: '',
@@ -171,7 +174,7 @@ export default {
       },
       repoList: [],
       parentcateList: [],
-      APPItems: [],
+      applicationItems: [],
       // 指定级联选择器的配置对象
       cascaderProps: {
         value: 'id',
@@ -181,12 +184,21 @@ export default {
       // 选中的父级分类的Id数组
       selectedKeys: [],
       // 默认激活索引
-      activeIndex: 0
+      activeIndex: 0,
+
+      recordFormRules: {
+        repositoryId: [
+          { required: true, message: '请选择仓库位置', trigger: 'change' }
+        ],
+        materialName: [
+          { required: true, message: '请填写物料名称', trigger: 'change' }
+        ]
+      }
     }
   },
   created() {
     this.getParentcateList()
-    this.getRepoList()
+    this.listRepositories()
   },
   methods: {
     querySearch(queryString, cb) {
@@ -196,7 +208,7 @@ export default {
         : restaurants
       // 调用 callback 返回建议列表的数据
       cb(results)
-      console.log(this.form)
+      console.log(this.recordForm)
     },
     createFilter(queryString) {
       return restaurant => {
@@ -206,9 +218,8 @@ export default {
         )
       }
     },
-
     handleSelect(item) {
-      this.form.materialId = item.key
+      this.recordForm.materialId = item.key
     },
     // 选择项发生变化触发这个函数
     parentCateChanged() {
@@ -218,55 +229,62 @@ export default {
         this.queryInfo.categoryId = this.selectedKeys[
           this.selectedKeys.length - 1
         ]
-        this.getMaterialList()
+        this.listMaterials()
       }
     },
+    // 获取父级分类
     async getParentcateList() {
       const { data: res } = await this.$http.get('category/menus', {})
 
       if (res.meta.status !== 200) {
         return this.$message.error('获取父级分类数据失败！')
       }
-
-      console.log(res.data)
       this.parentcateList = res.data
     },
     onSubmit() {
-      // console.log(this.form)
-      this.$refs.recordFormRef.validate(async valid => {
-        this.form.categoryId = this.queryInfo.categoryId
-        if (!valid) return
-        // 可以发起添加用户的网络请求
-        const { data: res } = await this.$http.post(
-          'applicationItem',
-          this.form
-        )
-
-        if (res.meta.status !== 201) {
-          this.$message.error('添加成功失败！')
+      // 验证表单
+      this.$refs.recordForm.validate(async valid => {
+        if (!valid) {
+          return
         }
-
-        this.form = []
-        this.form.count = 1
-        this.selectedKeys = []
-        this.$message.success('提交申请成功！')
-        // 隐藏添加用户的对话框
-        this.addDialogVisible = false
-        // 重新获取用户列表数据
-        this.getuserList()
+        // 提交申请单
+        this.submitApplyFormItem()
       })
     },
-    async submitApplication() {
-      const { data: res } = await this.$http.post('application/message', {
-        message: this.form.message
+    resetForm(formName) {
+      this.$refs[formName].resetFields()
+      this.selectedKeys = []
+    },
+    // 提交申请单项
+    async submitApplyFormItem() {
+      this.recordForm.categoryId = this.queryInfo.categoryId
+      const { data: res } = await this.$http.post('applyItem', this.recordForm)
+      if (res.meta.status !== 201) {
+        this.$message.error('添加成功失败！')
+        return
+      }
+      this.clearForm()
+      this.$message.success('提交申请成功！')
+    },
+    // 清空表单
+    clearForm() {
+      this.resetForm('recordForm')
+      // this.form.count = 1
+      // this.selectedKeys = []
+    },
+    // 提交申请单
+    async submitApplyForm() {
+      const { data: res } = await this.$http.post('apply/message', {
+        message: this.recordForm.message
       })
       if (res.meta.status !== 200) {
         return this.$message.error('提交申请失败！')
       }
-      this.activeIndex = 2
+      this.activeIndex = '0'
     },
-    async getMaterialList() {
-      this.queryInfo.repositoryId = this.form.repositoryId
+    // 获取物料列表
+    async listMaterials() {
+      this.queryInfo.repositoryId = this.recordForm.repositoryId
       const { data: res } = await this.$http.get('material/names', {
         params: this.queryInfo
       })
@@ -277,7 +295,8 @@ export default {
 
       this.restaurants = res.data
     },
-    async getRepoList() {
+    // 获取仓库列表
+    async listRepositories() {
       const { data: res } = await this.$http.get('repository/names')
 
       if (res.meta.status !== 200) {
@@ -286,28 +305,39 @@ export default {
 
       this.repoList = res.data
     },
-    async getItems() {
-      const { data: res } = await this.$http.get('applicationItem')
+    // 获取申请单项
+    async listItems() {
+      const { data: res } = await this.$http.get('applyItem')
 
       if (res.meta.status !== 200) {
         return this.$message.error('获取申请单列表失败！')
       }
+      this.applicationItems = res.data
+      return this.applicationItems
+    },
+    async removeItem(id) {
+      const { data: res } = await this.$http.delete('applyItem/' + id)
 
-      this.APPItems = res.data
+      if (res.meta.status !== 200) {
+        return this.$message.error('删除失败！')
+      }
+    },
+    // 下一步
+    nextStep() {
+      this.activeIndex = '1'
+      this.listItems()
+    },
+    preStep() {
+      this.activeIndex = '0'
     },
     // 立即提交申请
-    open() {
+    myAlert() {
       this.$confirm('此操作将直接提交申请, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
-        .then(() => {
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
-        })
+        .then(() => {})
         .catch(() => {
           this.$message({
             type: 'info',
@@ -315,21 +345,22 @@ export default {
           })
         })
     },
-
+    // 检测页签变化
     beforeTabLeave(activeName, oldActiveName) {
-      // console.log(activeName)
-      // console.log(activeName === '1')
       if (activeName === '1') {
-        console.log(oldActiveName)
-        console.log(activeName)
-        this.getItems()
-      }
-      if (oldActiveName === '2') {
-        return false
+        var res = this.listItems()
+        if (res.length === 0) {
+          this.$message({
+            type: 'info',
+            message: '请至少添加一种物料'
+          })
+          return false
+        }
       }
       return true
     },
     deleteRow(index, rows) {
+      this.removeItem(rows[index].id)
       rows.splice(index, 1)
     }
   },

@@ -10,7 +10,7 @@ import Categories from '../components/materials/Category.vue'
 import Params from '../components/materials/Params.vue'
 import Goods from '../components/materials/List.vue'
 import GoodsAdd from '../components/materials/Add.vue'
-import Orders from '../components/record/Order.vue'
+import Approve from '../components/record/Approve.vue'
 import Record from '../components/record/Record.vue'
 
 // 导入Login组件
@@ -34,7 +34,7 @@ const router = new VueRouter({
         { path: '/params', component: Params },
         { path: '/materials', component: Goods },
         { path: '/materials/add', component: GoodsAdd },
-        { path: '/orders', component: Orders },
+        { path: '/approve', component: Approve },
         { path: '/record', component: Record }
       ]
     }
