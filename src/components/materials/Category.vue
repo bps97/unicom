@@ -169,10 +169,6 @@ export default {
           prop: 'name'
         },
         {
-          label: '专业线',
-          prop: 'specialLine'
-        },
-        {
           label: '是否有效',
           // 表示，将当前列定义为模板列
           type: 'template',

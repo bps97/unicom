@@ -79,7 +79,7 @@
       <!-- 分页区域 -->
       <el-pagination @size-change="handleSizeChange"
                      @current-change="handleCurrentChange"
-                     :current-page="queryInfo.page"
+                     :current-page="queryInfo.current"
                      :page-sizes="[1, 2, 5, 10]"
                      :page-size="queryInfo.size"
                      layout="total, sizes, prev, pager, next, jumper"
@@ -214,7 +214,7 @@ export default {
       queryInfo: {
         key: '',
         // 当前的页数
-        page: 1,
+        current: 1,
         // 当前每页显示多少条数据
         size: 5
       },
@@ -306,7 +306,7 @@ export default {
     // 监听 页码值 改变的事件
     handleCurrentChange(newPage) {
       console.log(newPage)
-      this.queryInfo.page = newPage
+      this.queryInfo.current = newPage
       this.getuserList()
     },
     // 监听 switch 开关状态的改变

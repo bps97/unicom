@@ -12,6 +12,7 @@ import Goods from '../components/materials/List.vue'
 import GoodsAdd from '../components/materials/Add.vue'
 import Approve from '../components/record/Approve.vue'
 import Record from '../components/record/Record.vue'
+import Log from '../components/log/Log.vue'
 
 // 导入Login组件
 
@@ -35,7 +36,8 @@ const router = new VueRouter({
         { path: '/materials', component: Goods },
         { path: '/materials/add', component: GoodsAdd },
         { path: '/approve', component: Approve },
-        { path: '/record', component: Record }
+        { path: '/records', component: Record },
+        { path: '/logs', component: Log }
       ]
     }
   ]
