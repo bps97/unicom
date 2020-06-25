@@ -1,20 +1,31 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../components/Login.vue'
-import Home from '../components/Home.vue'
-import Welcome from '../components/Welcome.vue'
-import Users from '../components/user/Users.vue'
-import Rights from '../components/power/Rights.vue'
-import Roles from '../components/power/Roles.vue'
-import Categories from '../components/materials/Category.vue'
-import Params from '../components/materials/Params.vue'
-import Goods from '../components/materials/List.vue'
-import GoodsAdd from '../components/materials/Add.vue'
-import Approve from '../components/record/Approve.vue'
-import Record from '../components/record/Record.vue'
-import Log from '../components/log/Log.vue'
 
-// 导入Login组件
+// import Login from '../components/Login.vue'
+// import Home from '../components/Home.vue'
+// import Welcome from '../components/Welcome.vue'
+// import Users from '../components/user/Users.vue'
+
+// import Categories from '../components/materials/Category.vue'
+// import Params from '../components/materials/Params.vue'
+// import Materials from '../components/materials/List.vue'
+// import Approve from '../components/record/Approve.vue'
+// import Records from '../components/record/Record.vue'
+// import Log from '../components/log/Log.vue'
+
+const Login = () => import(/* webpackChunkName: "Base_Page" */ '../components/Login.vue')
+const Home = () => import(/* webpackChunkName: "Base_Page" */ '../components/Home.vue')
+const Welcome = () => import(/* webpackChunkName: "Base_Page" */ '../components/Welcome.vue')
+
+const Users = () => import(/* webpackChunkName: "Users" */ '../components/user/Users.vue')
+
+const Categories = () => import(/* webpackChunkName: "Materials" */ '../components/materials/Category.vue')
+const Params = () => import(/* webpackChunkName: "Materials" */ '../components/materials/Params.vue')
+const Materials = () => import(/* webpackChunkName: "Materials" */ '../components/materials/List.vue')
+
+const Approve = () => import(/* webpackChunkName: "Records" */ '../components/record/Approve.vue')
+const Records = () => import(/* webpackChunkName: "Records" */ '../components/record/Record.vue')
+const Log = () => import(/* webpackChunkName: "Records" */ '../components/log/Log.vue')
 
 Vue.use(VueRouter)
 
@@ -29,14 +40,11 @@ const router = new VueRouter({
       children: [
         { path: '/welcome', component: Welcome },
         { path: '/users', component: Users },
-        { path: '/rights', component: Rights },
-        { path: '/roles', component: Roles },
         { path: '/categories', component: Categories },
         { path: '/params', component: Params },
-        { path: '/materials', component: Goods },
-        { path: '/materials/add', component: GoodsAdd },
+        { path: '/materials', component: Materials },
         { path: '/approve', component: Approve },
-        { path: '/records', component: Record },
+        { path: '/records', component: Records },
         { path: '/logs', component: Log }
       ]
     }

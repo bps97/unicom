@@ -99,7 +99,7 @@ export default {
       // 商品分类的数据列表，默认为空
       total: 0,
       repositoryList: {},
-      recordList: {},
+      recordList: undefined,
       specialLines: logTypes,
       activeName: '1270283833125527553',
       logForm: {

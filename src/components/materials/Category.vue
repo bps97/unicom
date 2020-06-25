@@ -92,7 +92,8 @@
         </el-form-item>
         <el-form-item label="专业线"
                       prop="specialLine">
-          <el-input v-model="editForm.specialLine"></el-input>
+          <el-input v-model="editForm.specialLine"
+                    disabled></el-input>
         </el-form-item>
         <el-form-item label="等级"
                       prop="level">
@@ -118,10 +119,6 @@
                :rules="addCateFormRules"
                ref="addCateFormRef"
                label-width="100px">
-        <el-form-item label="分类名称："
-                      prop="name">
-          <el-input v-model="addCateForm.name"></el-input>
-        </el-form-item>
         <el-form-item label="父级分类：">
           <!-- options 用来指定数据源 -->
           <!-- props 用来指定配置对象 -->
@@ -131,8 +128,12 @@
                        v-model="selectedKeys"
                        @change="parentCateChanged"
                        clearable
-                       change-on-select>
+                       props.checkStrictly>
           </el-cascader>
+        </el-form-item>
+        <el-form-item label="分类名称："
+                      prop="name">
+          <el-input v-model="addCateForm.name"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer"
@@ -197,9 +198,7 @@ export default {
         // 将要添加的分类的名称
         name: '',
         // 父级分类的Id
-        parent_id: 0,
-        // 分类的等级，默认要添加的是1级分类
-        level: 0
+        parentId: 0
       },
       // 添加分类表单的验证规则对象
       addCateFormRules: {
@@ -297,16 +296,12 @@ export default {
       // 反之，就说明没有选中任何父级分类
       if (this.selectedKeys.length > 0) {
         // 父级分类的Id
-        this.addCateForm.parent_id = this.selectedKeys[
+        this.addCateForm.parentId = this.selectedKeys[
           this.selectedKeys.length - 1
         ]
-        // 为当前分类的等级赋值
-        this.addCateForm.level = this.selectedKeys.length
       } else {
         // 父级分类的Id
-        this.addCateForm.parent_id = 0
-        // 为当前分类的等级赋值
-        this.addCateForm.level = 0
+        this.addCateForm.parentId = 0
       }
     },
     // 点击按钮，添加新的分类
@@ -314,7 +309,7 @@ export default {
       this.$refs.addCateFormRef.validate(async valid => {
         if (!valid) return
         const { data: res } = await this.$http.post(
-          'categories',
+          'category/add',
           this.addCateForm
         )
 
@@ -325,14 +320,14 @@ export default {
         this.$message.success('添加分类成功！')
         this.getcateList()
         this.addCateDialogVisible = false
+        this.shiftTabs()
       })
     },
     // 监听对话框的关闭事件，重置表单数据
     addCateDialogClosed() {
       this.$refs.addCateFormRef.resetFields()
       this.selectedKeys = []
-      this.addCateForm.level = 0
-      this.addCateForm.parent_id = 0
+      this.addCateForm.parentId = 0
     },
     // 展示编辑用户的对话框
     async showEditDialog(id) {
@@ -350,30 +345,27 @@ export default {
     editDialogClosed() {
       this.$refs.editFormRef.resetFields()
     },
-    // 修改用户信息并提交
+    // 修改分类信息并提交
     editUserInfo() {
       this.$refs.editFormRef.validate(async valid => {
         if (!valid) return
         // 发起修改用户信息的数据请求
         const { data: res } = await this.$http.put(
-          'account/' + this.editForm.id,
+          'category/' + this.editForm.id,
           {
-            name: this.editForm.name,
-            email: this.editForm.email,
-            mobile: this.editForm.mobile
+            name: this.editForm.name
           }
         )
 
         if (res.meta.status !== 200) {
-          return this.$message.error('更新用户信息失败！')
+          return this.$message.error('更新分类信息失败！')
         }
-
+        // 提示修改成功
+        this.$message.success('更新分类信息成功！，注：页面未同步')
         // 关闭对话框
         this.editDialogVisible = false
         // 刷新数据列表
-        this.getuserList()
-        // 提示修改成功
-        this.$message.success('更新用户信息成功！')
+        this.shiftTabs()
       })
     },
     // 根据Id删除对应的用户信息
@@ -396,14 +388,14 @@ export default {
         return this.$message.info('已取消删除')
       }
 
-      const { data: res } = await this.$http.delete('account/' + id)
+      const { data: res } = await this.$http.delete('category/' + id)
 
       if (res.meta.status !== 200) {
-        return this.$message.error('删除用户失败！')
+        return this.$message.error('删除该分类失败！')
       }
 
-      this.$message.success('删除用户成功！')
-      this.getuserList()
+      this.$message.success('删除该分类成功！')
+      this.shiftTabs()
     }
   }
 }

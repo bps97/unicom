@@ -19,7 +19,7 @@
                        v-model="selectedKeys"
                        @change="parentCateChanged"
                        clearable
-                       change-on-select>
+                       props.checkStrictly>
           </el-cascader>
         </el-col>
         <el-col :span="6">
@@ -34,7 +34,7 @@
         </el-col>
         <el-col :span="4">
           <el-button type="primary"
-                     @click="goAddpage">添加物料</el-button>
+                     @click="showAddMaterialDialog">添加物料</el-button>
         </el-col>
       </el-row>
       <br>
@@ -81,7 +81,31 @@
                      :total="total"
                      background>
       </el-pagination>
+      <!-- 添加物料的对话框 -->
+      <el-dialog title="添加物料"
+                 :visible.sync="addMaterialDialogVisible"
+                 width="50%"
+                 @close="adddMaterialDialogClosed">
+        <!-- 添加分类的表单 -->
+
+        <el-form :model="adddMaterialForm"
+                 :rules="adddMaterialFormRules"
+                 ref="adddMaterialFormRef"
+                 label-width="100px">
+          <el-form-item label="分类名称："
+                        prop="name">
+            <el-input placeholder="暂时不可用"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer"
+              class="dialog-footer">
+          <el-button @click="addMaterialDialogVisible = false">取 消</el-button>
+          <el-button type="primary"
+                     @click="addCate">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
+
   </div>
 </template>
 
@@ -111,7 +135,9 @@ export default {
         children: 'children'
       },
       // 选中的父级分类的Id数组
-      selectedKeys: []
+      selectedKeys: [],
+      // 控制添加w物料对话框的显示与隐藏
+      addMaterialDialogVisible: false
     }
   },
   created() {
@@ -120,6 +146,30 @@ export default {
     this.getParentcateList()
   },
   methods: {
+    // 点击按钮，展示添加分类的对话框
+    showAddMaterialDialog() {
+      // 再展示出对话框
+      this.addMaterialDialogVisible = true
+    },
+    // 点击按钮，添加新的物料
+    addCate() {
+      this.$refs.addMaterialFormRef.validate(async valid => {
+        if (!valid) return
+        const { data: res } = await this.$http.post(
+          'material/add',
+          this.addMaterialForm
+        )
+
+        if (res.meta.status !== 201) {
+          return this.$message.error('添加分类失败！')
+        }
+
+        this.$message.success('添加分类成功！')
+        this.getcateList()
+        this.addMaterialDialogVisible = false
+        this.shiftTabs()
+      })
+    },
     // 根据分页获取对应的商品列表
     async getGoodsList() {
       const { data: res } = await this.$http.get('material', {
@@ -166,9 +216,7 @@ export default {
       this.$message.success('删除成功！')
       this.getGoodsList()
     },
-    goAddpage() {
-      this.$router.push('/materials/add')
-    },
+
     // 选择项发生变化触发这个函数
     parentCateChanged() {
       // console.log(this.selectedKeys)
