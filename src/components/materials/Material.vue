@@ -9,27 +9,24 @@
 
     <!-- 卡片视图区域 -->
     <el-card>
-
       <el-row :gutter="20">
         <!-- 选择商品分类区域 -->
         <el-col :span='5'>
           <el-cascader expand-trigger="hover"
-                       :options="parentcateList"
+                       :options="parentCategoryList"
                        :props="cascaderProps"
                        v-model="selectedKeys"
-                       @change="parentCateChanged"
-                       clearable
-                       props.checkStrictly>
+                       @change="parentCateChanged">
           </el-cascader>
         </el-col>
         <el-col :span="6">
-          <el-input placeholder="请输入内容"
+          <el-input placeholder="请输入关键字"
                     v-model="queryInfo.key"
                     clearable
-                    @clear="getGoodsList">
+                    @clear="listMaterials">
             <el-button slot="append"
                        icon="el-icon-search"
-                       @click="getGoodsList"></el-button>
+                       @click="listMaterials"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
@@ -39,7 +36,7 @@
       </el-row>
       <br>
       <!-- table表格区域 -->
-      <el-table :data="goodslist"
+      <el-table :data="materialList"
                 border
                 stripe>
         <el-table-column type="index"></el-table-column>
@@ -85,12 +82,11 @@
       <el-dialog title="添加物料"
                  :visible.sync="addMaterialDialogVisible"
                  width="50%"
-                 @close="adddMaterialDialogClosed">
+                 @close="addMaterialDialogClosed">
         <!-- 添加分类的表单 -->
 
-        <el-form :model="adddMaterialForm"
-                 :rules="adddMaterialFormRules"
-                 ref="adddMaterialFormRef"
+        <el-form :model="addMaterialForm"
+                 ref="addMaterialFormRef"
                  label-width="100px">
           <el-form-item label="分类名称："
                         prop="name">
@@ -101,7 +97,7 @@
               class="dialog-footer">
           <el-button @click="addMaterialDialogVisible = false">取 消</el-button>
           <el-button type="primary"
-                     @click="addCate">确 定</el-button>
+                     @click="addMaterial">确 定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -123,75 +119,63 @@ export default {
       // 分类列表
       catelist: [],
       // 商品列表
-      goodslist: [],
+      materialList: undefined,
       // 总数据条数
       total: 0,
       // 父级分类的列表
-      parentcateList: [],
+      parentCategoryList: [],
       // 指定级联选择器的配置对象
       cascaderProps: {
         value: 'id',
         label: 'name',
-        children: 'children'
+        children: 'children',
+        checkStrictly: true
       },
       // 选中的父级分类的Id数组
       selectedKeys: [],
       // 控制添加w物料对话框的显示与隐藏
-      addMaterialDialogVisible: false
+      addMaterialDialogVisible: false,
+      addMaterialForm: undefined
     }
   },
   created() {
-    console.log(this)
     // 先获取父级分类的数据列表
     this.getParentcateList()
   },
   methods: {
-    // 点击按钮，展示添加分类的对话框
+    // 点击按钮，展示添加物料的对话框
     showAddMaterialDialog() {
-      // 再展示出对话框
       this.addMaterialDialogVisible = true
     },
-    // 点击按钮，添加新的物料
-    addCate() {
-      this.$refs.addMaterialFormRef.validate(async valid => {
-        if (!valid) return
-        const { data: res } = await this.$http.post(
-          'material/add',
-          this.addMaterialForm
-        )
-
-        if (res.meta.status !== 201) {
-          return this.$message.error('添加分类失败！')
-        }
-
-        this.$message.success('添加分类成功！')
-        this.getcateList()
-        this.addMaterialDialogVisible = false
-        this.shiftTabs()
-      })
+    // 监听添加物料对话框的关闭事件
+    addMaterialDialogClosed() {
+      this.$refs.addMaterialFormRef.resetFields()
     },
-    // 根据分页获取对应的商品列表
-    async getGoodsList() {
-      const { data: res } = await this.$http.get('material', {
-        params: this.queryInfo
-      })
 
-      if (res.meta.status !== 200) {
-        return this.$message.error('获取商品列表失败！')
-      }
-
-      this.$message.success('获取商品列表成功！')
-      this.goodslist = res.data.content
-      this.total = res.data.total
-    },
     handleSizeChange(newSize) {
       this.queryInfo.size = newSize
-      this.getGoodsList()
+      this.listMaterials()
     },
     handleCurrentChange(newPage) {
       this.queryInfo.page = newPage
-      this.getGoodsList()
+      this.listMaterials()
     },
+
+    // 选择项发生变化触发这个函数
+    parentCateChanged() {
+      // console.log(this.selectedKeys)
+      if (this.selectedKeys !== undefined) {
+        if (this.selectedKeys.length > 0) {
+          this.queryInfo.categoryId = this.selectedKeys[
+            this.selectedKeys.length - 1
+          ]
+        }
+      }
+    },
+
+    // 后端数据接口👇
+
+    // 删除指定物料
     async removeById(id) {
       const confirmResult = await this.$confirm(
         '此操作将永久删除该商品, 是否继续?',
@@ -206,7 +190,6 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('已经取消删除！')
       }
-
       const { data: res } = await this.$http.delete(`goods/${id}`)
 
       if (res.meta.status !== 200) {
@@ -214,19 +197,27 @@ export default {
       }
 
       this.$message.success('删除成功！')
-      this.getGoodsList()
+      this.listMaterials()
     },
 
-    // 选择项发生变化触发这个函数
-    parentCateChanged() {
-      // console.log(this.selectedKeys)
-      if (this.selectedKeys !== undefined && this.selectedKeys.length > 1) {
-        this.queryInfo.categoryId = this.selectedKeys[
-          this.selectedKeys.length - 1
-        ]
-        this.getGoodsList()
-      }
+    // 点击按钮，添加新的物料
+    addMaterial() {
+      this.$refs.addMaterialFormRef.validate(async valid => {
+        if (!valid) return
+        const { data: res } = await this.$http.post(
+          'material/add',
+          this.addMaterialForm
+        )
+
+        if (res.meta.status !== 201) {
+          return this.$message.error('添加分类失败！')
+        }
+        this.$message.success('添加分类成功！')
+        this.addMaterialDialogVisible = false
+      })
     },
+
+    // 请求获取分类菜单
     async getParentcateList() {
       const { data: res } = await this.$http.get('category/menus', {})
 
@@ -234,8 +225,26 @@ export default {
         return this.$message.error('获取父级分类数据失败！')
       }
 
-      console.log(res.data)
-      this.parentcateList = res.data
+      this.parentCategoryList = res.data
+    },
+
+    // 根据分页信息请求对应的物料列表
+    async listMaterials() {
+      const { data: res } = await this.$http.get('material', {
+        params: {
+          current: this.queryInfo.page,
+          size: this.queryInfo.size,
+          categoryId: this.queryInfo.categoryId,
+          key: this.queryInfo.key
+        }
+      })
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取商品列表失败！')
+      }
+      this.$message.success('获取商品列表成功！')
+      this.materialList = res.data.records
+      console.log(this.materialList)
+      this.total = res.data.total
     }
   }
 }

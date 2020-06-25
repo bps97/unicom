@@ -26,6 +26,7 @@
                      @click="addDialogVisible = true">添加用户</el-button>
         </el-col>
       </el-row>
+      <br>
 
       <!-- 用户列表区域 -->
       <el-table :data="userList"
@@ -188,12 +189,10 @@ export default {
     var checkEmail = (rule, value, cb) => {
       // 验证邮箱的正则表达式
       const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/
-
       if (regEmail.test(value)) {
         // 合法的邮箱
         return cb()
       }
-
       cb(new Error('请输入合法的邮箱'))
     }
 

@@ -13,34 +13,27 @@
       <el-row>
         <el-col>
           <el-button type="primary"
-                     @click="showAddCateDialog">添加分类</el-button>
+                     @click="showAddCategoryDialog">添加分类</el-button>
         </el-col>
       </el-row>
       <!-- tab 页签区域 -->
       <el-tabs v-model="activeName"
                @tab-click="shiftTabs">
-        <el-tab-pane v-for='item in cateData'
+        <el-tab-pane v-for='item in categoryData'
                      :key='item.id'
                      :label='item.name'
                      :name='item.id'>
         </el-tab-pane>
         <!-- 表格 -->
         <tree-table class="treeTable"
-                    :data="cateList"
+                    :data="categoryList"
                     :columns="columns"
                     :selection-type="false"
                     :expand-type="false"
                     show-index
-                    index-text="#"
-                    border
+                    index-text="序号"
+                    stripe
                     :show-row-hover="false">
-          <!-- 是否有效 -->
-          <template slot="isok"
-                    slot-scope="scope">
-            <el-switch v-model="scope.row.available"
-                       @change="categoryStateChanged(scope.row)">
-            </el-switch>
-          </template>
           <!-- 排序 -->
           <template slot="order"
                     slot-scope="scope">
@@ -53,6 +46,13 @@
                     size="mini"
                     v-else>三级</el-tag>
           </template>
+          <!-- 是否有效 -->
+          <template slot="isok"
+                    slot-scope="scope">
+            <el-switch v-model="scope.row.available"
+                       @change="closeAvailable(scope.row)">
+            </el-switch>
+          </template>
           <!-- 操作 -->
           <template slot="opt"
                     slot-scope="scope">
@@ -63,7 +63,7 @@
             <el-button type="danger"
                        icon="el-icon-delete"
                        size="mini"
-                       @click="removeUserById(scope.row.id)">删除</el-button>
+                       @click="removeById(scope.row.id)">删除</el-button>
           </template>
         </tree-table>
 
@@ -79,7 +79,7 @@
       </el-tabs>
     </el-card>
 
-    <!-- 修改用户的对话框 -->
+    <!-- 修改分类的对话框 -->
     <el-dialog title="修改分类"
                :visible.sync="editDialogVisible"
                width="50%"
@@ -111,34 +111,33 @@
 
     <!-- 添加分类的对话框 -->
     <el-dialog title="添加分类"
-               :visible.sync="addCateDialogVisible"
+               :visible.sync="addCategoryDialogVisible"
                width="50%"
-               @close="addCateDialogClosed">
+               @close="addCategoryDialogClosed">
       <!-- 添加分类的表单 -->
-      <el-form :model="addCateForm"
-               :rules="addCateFormRules"
-               ref="addCateFormRef"
+      <el-form :model="addCategoryFrom"
+               :rules="addCategoryFromRules"
+               ref="addCategoryFromRef"
                label-width="100px">
         <el-form-item label="父级分类：">
           <!-- options 用来指定数据源 -->
           <!-- props 用来指定配置对象 -->
           <el-cascader expand-trigger="hover"
-                       :options="parentcateList"
+                       :options="parentCategoryList"
                        :props="cascaderProps"
                        v-model="selectedKeys"
-                       @change="parentCateChanged"
-                       clearable
-                       props.checkStrictly>
+                       @change="parentCategoryChanged"
+                       clearable>
           </el-cascader>
         </el-form-item>
         <el-form-item label="分类名称："
                       prop="name">
-          <el-input v-model="addCateForm.name"></el-input>
+          <el-input v-model="addCategoryFrom.name"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer"
             class="dialog-footer">
-        <el-button @click="addCateDialogVisible = false">取 消</el-button>
+        <el-button @click="addCategoryDialogVisible = false">取 消</el-button>
         <el-button type="primary"
                    @click="addCate">确 定</el-button>
       </span>
@@ -158,9 +157,9 @@ export default {
       },
       activeName: '无线',
       // 商品分类的数据列表，默认为空
-      cateList: [],
+      categoryList: [],
       // 总的数据
-      cateData: [],
+      categoryData: [],
       // 总数据条数
       total: 0,
       // 为table指定列的定义
@@ -170,18 +169,18 @@ export default {
           prop: 'name'
         },
         {
-          label: '是否有效',
-          // 表示，将当前列定义为模板列
-          type: 'template',
-          // 表示当前这一列使用模板名称
-          template: 'isok'
-        },
-        {
           label: '类别等级',
           // 表示，将当前列定义为模板列
           type: 'template',
           // 表示当前这一列使用模板名称
           template: 'order'
+        },
+        {
+          label: '是否有效',
+          // 表示，将当前列定义为模板列
+          type: 'template',
+          // 表示当前这一列使用模板名称
+          template: 'isok'
         },
         {
           label: '操作',
@@ -192,25 +191,26 @@ export default {
         }
       ],
       // 控制添加分类对话框的显示与隐藏
-      addCateDialogVisible: false,
+      addCategoryDialogVisible: false,
       // 添加分类的表单数据对象
-      addCateForm: {
+      addCategoryFrom: {
         // 将要添加的分类的名称
         name: '',
         // 父级分类的Id
         parentId: 0
       },
       // 添加分类表单的验证规则对象
-      addCateFormRules: {
+      addCategoryFromRules: {
         name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
       },
       // 父级分类的列表
-      parentcateList: [],
+      parentCategoryList: [],
       // 指定级联选择器的配置对象
       cascaderProps: {
         value: 'id',
         label: 'name',
-        children: 'children'
+        children: 'children',
+        checkStrictly: true
       },
       // 选中的父级分类的Id数组
       selectedKeys: [],
@@ -221,11 +221,11 @@ export default {
     }
   },
   created() {
-    this.getcateList()
+    this.getcategoryList()
   },
   methods: {
     // 监听 switch 开关状态的改变
-    async categoryStateChanged(user) {
+    async closeAvailable(user) {
       const { data: res } = await this.$http.put(
         `category/${user.id}/available/${user.available}`
       )
@@ -238,14 +238,16 @@ export default {
     // 切换标签
     shiftTabs() {
       // console.log(this.activeName)
-      // this.cateData.forEach(item => console.log(item.id))
-      var temp = this.cateData.filter(item => item.id === this.activeName)[0]
-      this.cateList = temp.children != null ? temp.children : []
-      this.total = this.cateList.length
+      // this.categoryData.forEach(item => console.log(item.id))
+      var temp = this.categoryData.filter(
+        item => item.id === this.activeName
+      )[0]
+      this.categoryList = temp.children != null ? temp.children : []
+      this.total = this.categoryList.length
     },
 
     // 获取商品分类数据
-    async getcateList() {
+    async getcategoryList() {
       const { data: res } = await this.$http.get('category', {
         params: this.querInfo
       })
@@ -255,31 +257,31 @@ export default {
       }
 
       console.log(res.data)
-      // 把数据列表，赋值给 cateList
-      this.cateData = res.data.content
-      this.cateList = this.cateData[0].children
+      // 把数据列表，赋值给 categoryList
+      this.categoryData = res.data.records
+      this.categoryList = this.categoryData[0].children
       // 为总数据条数赋值
-      this.total = this.cateList.length
+      this.total = this.categoryList.length
     },
     // 监听 size 改变
     handleSizeChange(newSize) {
       this.querInfo.size = newSize
-      this.getcateList()
+      this.getcategoryList()
     },
     // 监听 page 改变
     handleCurrentChange(newPage) {
       this.querInfo.page = newPage
-      this.getcateList()
+      this.getcategoryList()
     },
     // 点击按钮，展示添加分类的对话框
-    showAddCateDialog() {
+    showAddCategoryDialog() {
       // 先获取父级分类的数据列表
-      this.getParentcateList()
+      this.getParentcategoryList()
       // 再展示出对话框
-      this.addCateDialogVisible = true
+      this.addCategoryDialogVisible = true
     },
     // 获取父级分类的数据列表
-    async getParentcateList() {
+    async getParentcategoryList() {
       const { data: res } = await this.$http.get('category/menus', {})
 
       if (res.meta.status !== 200) {
@@ -287,30 +289,30 @@ export default {
       }
 
       console.log(res.data)
-      this.parentcateList = res.data
+      this.parentCategoryList = res.data
     },
     // 选择项发生变化触发这个函数
-    parentCateChanged() {
+    parentCategoryChanged() {
       console.log(this.selectedKeys)
       // 如果 selectedKeys 数组中的 length 大于0，证明选中的父级分类
       // 反之，就说明没有选中任何父级分类
       if (this.selectedKeys.length > 0) {
         // 父级分类的Id
-        this.addCateForm.parentId = this.selectedKeys[
+        this.addCategoryFrom.parentId = this.selectedKeys[
           this.selectedKeys.length - 1
         ]
       } else {
         // 父级分类的Id
-        this.addCateForm.parentId = 0
+        this.addCategoryFrom.parentId = 0
       }
     },
     // 点击按钮，添加新的分类
     addCate() {
-      this.$refs.addCateFormRef.validate(async valid => {
+      this.$refs.addCategoryFromRef.validate(async valid => {
         if (!valid) return
         const { data: res } = await this.$http.post(
           'category/add',
-          this.addCateForm
+          this.addCategoryFrom
         )
 
         if (res.meta.status !== 201) {
@@ -318,16 +320,16 @@ export default {
         }
 
         this.$message.success('添加分类成功！')
-        this.getcateList()
-        this.addCateDialogVisible = false
+        this.getcategoryList()
+        this.addCategoryDialogVisible = false
         this.shiftTabs()
       })
     },
     // 监听对话框的关闭事件，重置表单数据
-    addCateDialogClosed() {
-      this.$refs.addCateFormRef.resetFields()
+    addCategoryDialogClosed() {
+      this.$refs.addCategoryFromRef.resetFields()
       this.selectedKeys = []
-      this.addCateForm.parentId = 0
+      this.addCategoryFrom.parentId = 0
     },
     // 展示编辑用户的对话框
     async showEditDialog(id) {
@@ -369,7 +371,7 @@ export default {
       })
     },
     // 根据Id删除对应的用户信息
-    async removeUserById(id) {
+    async removeById(id) {
       // 弹框询问用户是否删除数据
       const confirmResult = await this.$confirm(
         '此操作将永久删除该用户, 是否继续?',

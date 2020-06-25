@@ -7,9 +7,6 @@
              alt="">
         <span>仓管系统</span>
       </div>
-      <!-- <el-button type="info"
-                 @click="logout">退出</el-button> -->
-
       <el-menu class="el-menu-demo"
                mode="horizontal"
                background-color="#333854"
@@ -20,23 +17,17 @@
           <el-menu-item index="2-1"
                         @click="logout">退出
           </el-menu-item>
-          <!-- <el-menu-item index="2-2">选项2</el-menu-item>
-          <el-menu-item index="2-3">选项3</el-menu-item>
-          <el-submenu index="2-4">
-            <template slot="title">选项4</template>
-            <el-menu-item index="2-4-1">选项1</el-menu-item>
-            <el-menu-item index="2-4-2">选项2</el-menu-item>
-            <el-menu-item index="2-4-3">选项3</el-menu-item>
-          </el-submenu> -->
         </el-submenu>
-        <el-menu-item index="2"><a href="http://www.10010.com/"
-             target="_blank">关于我们</a></el-menu-item>
+        <el-menu-item index="2">
+          <a href="https://www.10010.com/"
+             target="_blank">关于我们</a>
+        </el-menu-item>
       </el-menu>
     </el-header>
     <!-- 页面主体区域 -->
     <el-container>
       <!-- 侧边栏 -->
-      <el-aside :width="isCollapse ? '64px' : '200px'">
+      <el-aside :width="isCollapse ? '66px' : '202px'">
         <div class="toggle-button"
              style="font-size:20px"
              @click="toggleCollapse"><i class="el-icon-s-unfold"></i></div>
@@ -109,8 +100,7 @@ export default {
     }
   },
   created() {
-    this.getMenuList()
-    // this.activePath = window.sessionStorage.getItem('activePath')
+    this.listMenus()
   },
   methods: {
     logout() {
@@ -118,7 +108,7 @@ export default {
       this.$router.push('/login')
     },
     // 获取所有的菜单
-    async getMenuList() {
+    async listMenus() {
       const { data: res } = await this.$http.get('/auth/menus')
       if (res.meta.status !== 200) return this.$message.error(res.message)
       this.menulist = res.data
@@ -136,7 +126,6 @@ export default {
   }
 }
 </script>
-
 <style lang="less" scoped>
 .home-container {
   height: 100%;

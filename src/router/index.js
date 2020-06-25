@@ -21,7 +21,7 @@ const Users = () => import(/* webpackChunkName: "Users" */ '../components/user/U
 
 const Categories = () => import(/* webpackChunkName: "Materials" */ '../components/materials/Category.vue')
 const Params = () => import(/* webpackChunkName: "Materials" */ '../components/materials/Params.vue')
-const Materials = () => import(/* webpackChunkName: "Materials" */ '../components/materials/List.vue')
+const Materials = () => import(/* webpackChunkName: "Materials" */ '../components/materials/Material.vue')
 
 const Approve = () => import(/* webpackChunkName: "Records" */ '../components/record/Approve.vue')
 const Records = () => import(/* webpackChunkName: "Records" */ '../components/record/Record.vue')
