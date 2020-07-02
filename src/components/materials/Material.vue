@@ -16,7 +16,7 @@
                        :options="parentCategoryList"
                        :props="cascaderProps"
                        v-model="selectedKeys"
-                       @change="parentCateChanged">
+                       @change="parentCategoryChanged">
           </el-cascader>
         </el-col>
         <el-col :span="6">
@@ -88,9 +88,29 @@
         <el-form :model="addMaterialForm"
                  ref="addMaterialFormRef"
                  label-width="100px">
-          <el-form-item label="分类名称："
-                        prop="name">
-            <el-input placeholder="暂时不可用"></el-input>
+          <el-form-item label="父级分类：">
+            <!-- options 用来指定数据源 -->
+            <!-- props 用来指定配置对象 -->
+            <el-cascader expand-trigger="hover"
+                         :options="parentCategoryList_add"
+                         :props="cascaderProps_add"
+                         v-model="selectedKeys_add"
+                         @change="parentCategoryChanged_add">
+            </el-cascader>
+          </el-form-item>
+          <el-form-item label="仓库位置"
+                        prop="repositoryId">
+            <el-select v-model="addMaterialForm.repositoryId"
+                       placeholder="请选择仓库">
+              <el-option v-for="item in repositoryList"
+                         :key='item.key'
+                         :label='item.value'
+                         :value="item.key"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="物料：">
+            <el-input prop="name"
+                      v-model="addMaterialForm.name"></el-input>
           </el-form-item>
         </el-form>
         <span slot="footer"
@@ -116,14 +136,15 @@ export default {
         size: 10,
         categoryId: ''
       },
-      // 分类列表
-      catelist: [],
+      // 仓库列表
+      repositoryList: [],
       // 商品列表
       materialList: undefined,
       // 总数据条数
       total: 0,
       // 父级分类的列表
       parentCategoryList: [],
+      parentCategoryList_add: [],
       // 指定级联选择器的配置对象
       cascaderProps: {
         value: 'id',
@@ -131,11 +152,22 @@ export default {
         children: 'children',
         checkStrictly: true
       },
+      cascaderProps_add: {
+        value: 'id',
+        label: 'name',
+        children: 'children'
+        // checkStrictly: true
+      },
       // 选中的父级分类的Id数组
       selectedKeys: [],
+      selectedKeys_add: [],
       // 控制添加w物料对话框的显示与隐藏
       addMaterialDialogVisible: false,
-      addMaterialForm: undefined
+      addMaterialForm: {
+        name: '',
+        repositoryId: '',
+        categoryId: ''
+      }
     }
   },
   created() {
@@ -146,6 +178,8 @@ export default {
     // 点击按钮，展示添加物料的对话框
     showAddMaterialDialog() {
       this.addMaterialDialogVisible = true
+      this.parentCategoryList_add = this.parentCategoryList
+      this.listRepositories()
     },
     // 监听添加物料对话框的关闭事件
     addMaterialDialogClosed() {
@@ -162,8 +196,7 @@ export default {
     },
 
     // 选择项发生变化触发这个函数
-    parentCateChanged() {
-      // console.log(this.selectedKeys)
+    parentCategoryChanged() {
       if (this.selectedKeys !== undefined) {
         if (this.selectedKeys.length > 0) {
           this.queryInfo.categoryId = this.selectedKeys[
@@ -172,8 +205,26 @@ export default {
         }
       }
     },
+    parentCategoryChanged_add() {
+      if (this.selectedKeys_add !== undefined) {
+        this.addMaterialForm.categoryId = this.selectedKeys_add[
+          this.selectedKeys_add.length - 1
+        ]
+      }
+    },
 
     // 后端数据接口👇
+
+    // 获取仓库列表
+    async listRepositories() {
+      const { data: res } = await this.$http.get('repository/names')
+
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取仓库列表失败！')
+      }
+
+      this.repositoryList = res.data
+    },
 
     // 删除指定物料
     async removeById(id) {
@@ -190,7 +241,7 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('已经取消删除！')
       }
-      const { data: res } = await this.$http.delete(`goods/${id}`)
+      const { data: res } = await this.$http.delete(`material/${id}`)
 
       if (res.meta.status !== 200) {
         return this.$message.error('删除失败！')
@@ -210,10 +261,11 @@ export default {
         )
 
         if (res.meta.status !== 201) {
-          return this.$message.error('添加分类失败！')
+          return this.$message.error('新增物料失败！')
         }
-        this.$message.success('添加分类成功！')
+        this.$message.success('新增物料成功！')
         this.addMaterialDialogVisible = false
+        this.listMaterials()
       })
     },
 
@@ -226,6 +278,7 @@ export default {
       }
 
       this.parentCategoryList = res.data
+      return res.data
     },
 
     // 根据分页信息请求对应的物料列表

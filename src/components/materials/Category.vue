@@ -19,10 +19,10 @@
       <!-- tab 页签区域 -->
       <el-tabs v-model="activeName"
                @tab-click="shiftTabs">
-        <el-tab-pane v-for='item in categoryData'
-                     :key='item.id'
-                     :label='item.name'
-                     :name='item.id'>
+        <el-tab-pane v-for='item in specialLineList'
+                     :key='item.key'
+                     :label='item.value'
+                     :name='item.key'>
         </el-tab-pane>
         <!-- 表格 -->
         <tree-table class="treeTable"
@@ -70,9 +70,9 @@
         <!-- 分页区域 -->
         <el-pagination @size-change="handleSizeChange"
                        @current-change="handleCurrentChange"
-                       :current-page="querInfo.page"
+                       :current-page="queryInfo.page"
                        :page-sizes="[3, 5, 10, 15]"
-                       :page-size="querInfo.size"
+                       :page-size="queryInfo.size"
                        layout="total, sizes, prev, pager, next, jumper"
                        :total="total">
         </el-pagination>
@@ -111,13 +111,13 @@
 
     <!-- 添加分类的对话框 -->
     <el-dialog title="添加分类"
-               :visible.sync="addCategoryDialogVisible"
+               :visible.sync="addCategorygoryDialogVisible"
                width="50%"
-               @close="addCategoryDialogClosed">
+               @close="addCategorygoryDialogClosed">
       <!-- 添加分类的表单 -->
-      <el-form :model="addCategoryFrom"
-               :rules="addCategoryFromRules"
-               ref="addCategoryFromRef"
+      <el-form :model="addCategorygoryFrom"
+               :rules="addCategorygoryFromRules"
+               ref="addCategorygoryFromRef"
                label-width="100px">
         <el-form-item label="父级分类：">
           <!-- options 用来指定数据源 -->
@@ -132,14 +132,14 @@
         </el-form-item>
         <el-form-item label="分类名称："
                       prop="name">
-          <el-input v-model="addCategoryFrom.name"></el-input>
+          <el-input v-model="addCategorygoryFrom.name"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer"
             class="dialog-footer">
-        <el-button @click="addCategoryDialogVisible = false">取 消</el-button>
+        <el-button @click="addCategorygoryDialogVisible = false">取 消</el-button>
         <el-button type="primary"
-                   @click="addCate">确 定</el-button>
+                   @click="addCategory">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -150,16 +150,13 @@ export default {
   data() {
     return {
       // 查询条件
-      querInfo: {
-        level: '',
+      queryInfo: {
         page: 1,
         size: 5
       },
-      activeName: '无线',
+      activeName: '1271005839779250177',
       // 商品分类的数据列表，默认为空
       categoryList: [],
-      // 总的数据
-      categoryData: [],
       // 总数据条数
       total: 0,
       // 为table指定列的定义
@@ -191,16 +188,16 @@ export default {
         }
       ],
       // 控制添加分类对话框的显示与隐藏
-      addCategoryDialogVisible: false,
+      addCategorygoryDialogVisible: false,
       // 添加分类的表单数据对象
-      addCategoryFrom: {
+      addCategorygoryFrom: {
         // 将要添加的分类的名称
         name: '',
         // 父级分类的Id
         parentId: 0
       },
       // 添加分类表单的验证规则对象
-      addCategoryFromRules: {
+      addCategorygoryFromRules: {
         name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
       },
       // 父级分类的列表
@@ -217,13 +214,71 @@ export default {
       // 控制修改用户对话框的显示与隐藏
       editDialogVisible: false,
       // 查询到的用户信息对象
-      editForm: {}
+      editForm: {},
+      specialLineList: {}
     }
   },
   created() {
-    this.getcategoryList()
+    this.listSpecialLine()
+    this.listCategories()
   },
   methods: {
+    // 监听 size 改变
+    handleSizeChange(newSize) {
+      this.queryInfo.size = newSize
+      this.listCategories()
+    },
+    // 监听 page 改变
+    handleCurrentChange(newPage) {
+      this.queryInfo.page = newPage
+      this.listCategories()
+    },
+    // 点击按钮，展示添加分类的对话框
+    showAddCategoryDialog() {
+      // 先获取父级分类的数据列表
+      this.listParentCategories()
+      // 再展示出对话框
+      this.addCategorygoryDialogVisible = true
+    },
+
+    // 选择项发生变化触发这个函数
+    parentCategoryChanged() {
+      console.log(this.selectedKeys)
+      // 如果 selectedKeys 数组中的 length 大于0，证明选中的父级分类
+      // 反之，就说明没有选中任何父级分类
+      if (this.selectedKeys.length > 0) {
+        // 父级分类的Id
+        this.addCategorygoryFrom.parentId = this.selectedKeys[
+          this.selectedKeys.length - 1
+        ]
+      } else {
+        // 父级分类的Id
+        this.addCategorygoryFrom.parentId = 0
+      }
+    },
+
+    // 监听对话框的关闭事件，重置表单数据
+    addCategorygoryDialogClosed() {
+      this.$refs.addCategorygoryFromRef.resetFields()
+      this.selectedKeys = []
+      this.addCategorygoryFrom.parentId = 0
+    },
+    // 切换标签
+    shiftTabs() {
+      this.queryInfo.specialLineId = this.activeName
+      this.listCategories()
+    },
+
+    // 后端交互相关
+
+    async listSpecialLine() {
+      const { data: res } = await this.$http.get('category/specialLine')
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取专业线标签失败！')
+      }
+      this.specialLineList = res.data
+    },
+
     // 监听 switch 开关状态的改变
     async closeAvailable(user) {
       const { data: res } = await this.$http.put(
@@ -235,21 +290,15 @@ export default {
       }
       this.$message.success('更新分类有效性成功！')
     },
-    // 切换标签
-    shiftTabs() {
-      // console.log(this.activeName)
-      // this.categoryData.forEach(item => console.log(item.id))
-      var temp = this.categoryData.filter(
-        item => item.id === this.activeName
-      )[0]
-      this.categoryList = temp.children != null ? temp.children : []
-      this.total = this.categoryList.length
-    },
 
     // 获取商品分类数据
-    async getcategoryList() {
+    async listCategories() {
       const { data: res } = await this.$http.get('category', {
-        params: this.querInfo
+        params: {
+          current: this.queryInfo.page,
+          size: this.queryInfo.size,
+          specialLineId: this.activeName
+        }
       })
 
       if (res.meta.status !== 200) {
@@ -258,30 +307,15 @@ export default {
 
       console.log(res.data)
       // 把数据列表，赋值给 categoryList
-      this.categoryData = res.data.records
-      this.categoryList = this.categoryData[0].children
+      this.categoryList = res.data.records
       // 为总数据条数赋值
-      this.total = this.categoryList.length
-    },
-    // 监听 size 改变
-    handleSizeChange(newSize) {
-      this.querInfo.size = newSize
-      this.getcategoryList()
-    },
-    // 监听 page 改变
-    handleCurrentChange(newPage) {
-      this.querInfo.page = newPage
-      this.getcategoryList()
-    },
-    // 点击按钮，展示添加分类的对话框
-    showAddCategoryDialog() {
-      // 先获取父级分类的数据列表
-      this.getParentcategoryList()
-      // 再展示出对话框
-      this.addCategoryDialogVisible = true
+      this.total = res.data.total
+      if (this.total === 0) {
+        this.categoryList = undefined
+      }
     },
     // 获取父级分类的数据列表
-    async getParentcategoryList() {
+    async listParentCategories() {
       const { data: res } = await this.$http.get('category/menus', {})
 
       if (res.meta.status !== 200) {
@@ -291,28 +325,14 @@ export default {
       console.log(res.data)
       this.parentCategoryList = res.data
     },
-    // 选择项发生变化触发这个函数
-    parentCategoryChanged() {
-      console.log(this.selectedKeys)
-      // 如果 selectedKeys 数组中的 length 大于0，证明选中的父级分类
-      // 反之，就说明没有选中任何父级分类
-      if (this.selectedKeys.length > 0) {
-        // 父级分类的Id
-        this.addCategoryFrom.parentId = this.selectedKeys[
-          this.selectedKeys.length - 1
-        ]
-      } else {
-        // 父级分类的Id
-        this.addCategoryFrom.parentId = 0
-      }
-    },
+
     // 点击按钮，添加新的分类
-    addCate() {
-      this.$refs.addCategoryFromRef.validate(async valid => {
+    addCategory() {
+      this.$refs.addCategorygoryFromRef.validate(async valid => {
         if (!valid) return
         const { data: res } = await this.$http.post(
           'category/add',
-          this.addCategoryFrom
+          this.addCategorygoryFrom
         )
 
         if (res.meta.status !== 201) {
@@ -320,16 +340,9 @@ export default {
         }
 
         this.$message.success('添加分类成功！')
-        this.getcategoryList()
-        this.addCategoryDialogVisible = false
-        this.shiftTabs()
+        this.listCategories()
+        this.addCategorygoryDialogVisible = false
       })
-    },
-    // 监听对话框的关闭事件，重置表单数据
-    addCategoryDialogClosed() {
-      this.$refs.addCategoryFromRef.resetFields()
-      this.selectedKeys = []
-      this.addCategoryFrom.parentId = 0
     },
     // 展示编辑用户的对话框
     async showEditDialog(id) {
@@ -347,34 +360,11 @@ export default {
     editDialogClosed() {
       this.$refs.editFormRef.resetFields()
     },
-    // 修改分类信息并提交
-    editUserInfo() {
-      this.$refs.editFormRef.validate(async valid => {
-        if (!valid) return
-        // 发起修改用户信息的数据请求
-        const { data: res } = await this.$http.put(
-          'category/' + this.editForm.id,
-          {
-            name: this.editForm.name
-          }
-        )
-
-        if (res.meta.status !== 200) {
-          return this.$message.error('更新分类信息失败！')
-        }
-        // 提示修改成功
-        this.$message.success('更新分类信息成功！，注：页面未同步')
-        // 关闭对话框
-        this.editDialogVisible = false
-        // 刷新数据列表
-        this.shiftTabs()
-      })
-    },
     // 根据Id删除对应的用户信息
     async removeById(id) {
       // 弹框询问用户是否删除数据
       const confirmResult = await this.$confirm(
-        '此操作将永久删除该用户, 是否继续?',
+        '此操作将永久删除该分类信息, 是否继续?',
         '提示',
         {
           confirmButtonText: '确定',
@@ -397,7 +387,31 @@ export default {
       }
 
       this.$message.success('删除该分类成功！')
-      this.shiftTabs()
+      this.listCategories()
+    },
+
+    // 修改分类信息并提交
+    editUserInfo() {
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) return
+        // 发起修改用户信息的数据请求
+        const { data: res } = await this.$http.put(
+          'category/' + this.editForm.id,
+          {
+            name: this.editForm.name
+          }
+        )
+
+        if (res.meta.status !== 200) {
+          return this.$message.error('更新分类信息失败！')
+        }
+        // 提示修改成功
+        this.$message.success('更新分类信息成功！，注：页面未同步')
+        // 关闭对话框
+        this.editDialogVisible = false
+        // 刷新数据列表
+        this.listCategories()
+      })
     }
   }
 }

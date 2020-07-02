@@ -3,7 +3,7 @@ import {
   Button, Form, FormItem, Input, Message, Container, Header, Aside, Main, Menu,
   Submenu, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col, Table, TableColumn,
   Switch, Tooltip, Pagination, Dialog, MessageBox, Tag, Cascader, Alert, Tabs, TabPane,
-  Steps, Step, CheckboxGroup, Checkbox, Upload, Select, Option, Timeline, TimelineItem,
+  Steps, Step, CheckboxGroup, CheckboxButton, Upload, Select, Option, Timeline, TimelineItem,
   Autocomplete, Slider
 } from 'element-ui'
 
@@ -37,7 +37,7 @@ Vue.use(TabPane)
 Vue.use(Steps)
 Vue.use(Step)
 Vue.use(CheckboxGroup)
-Vue.use(Checkbox)
+Vue.use(CheckboxButton)
 Vue.use(Upload)
 Vue.use(Select)
 Vue.use(Option)

@@ -109,7 +109,7 @@ export default {
     },
     // 获取所有的菜单
     async listMenus() {
-      const { data: res } = await this.$http.get('/auth/menus')
+      const { data: res } = await this.$http.get('/menu/menus')
       if (res.meta.status !== 200) return this.$message.error(res.message)
       this.menulist = res.data
       console.log(res)

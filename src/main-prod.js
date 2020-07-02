@@ -10,6 +10,7 @@ import TreeTable from 'vue-table-with-tree-grid'
 import axios from 'axios'
 // 配置请求的根路径
 axios.defaults.baseURL = 'http://bps.cool:8101'
+// axios.defaults.baseURL = 'http://localhost:8101'
 axios.interceptors.request.use(config => {
   config.headers.token = window.sessionStorage.getItem('token')
   // 请求拦截器

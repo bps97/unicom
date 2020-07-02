@@ -26,11 +26,11 @@
             <!-- 多选框 -->
             <div style="margin-bottom: 20px">
               <el-checkbox-group v-model="logForm.checkedspecialLine"
-                                 size="small">
-                <el-checkbox v-for="tp in specialLines"
-                             :label="tp"
-                             :key="tp"
-                             border>{{tp}}</el-checkbox>
+                                 size="medium">
+                <el-checkbox-button v-for="tp in specialLines"
+                                    :label="tp"
+                                    :key="tp"
+                                    border>{{tp}}</el-checkbox-button>
 
               </el-checkbox-group>
 
