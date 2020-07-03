@@ -1,23 +1,13 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-// import Login from '../components/Login.vue'
-// import Home from '../components/Home.vue'
-// import Welcome from '../components/Welcome.vue'
-// import Users from '../components/user/Users.vue'
-
-// import Categories from '../components/materials/Category.vue'
-// import Params from '../components/materials/Params.vue'
-// import Materials from '../components/materials/List.vue'
-// import Approve from '../components/record/Approve.vue'
-// import Records from '../components/record/Record.vue'
-// import Log from '../components/log/Log.vue'
-
 const Login = () => import(/* webpackChunkName: "Base_Page" */ '../components/Login.vue')
 const Home = () => import(/* webpackChunkName: "Base_Page" */ '../components/Home.vue')
 const Welcome = () => import(/* webpackChunkName: "Base_Page" */ '../components/Welcome.vue')
 
-const Users = () => import(/* webpackChunkName: "Users" */ '../components/user/Users.vue')
+const Users = () => import(/* webpackChunkName: "Account" */ '../components/user/Users.vue')
+const Privilege = () => import(/* webpackChunkName: "Account" */ '../components/privilege/Privilege.vue')
+const Role = () => import(/* webpackChunkName: "Account" */ '../components/privilege/Role.vue')
 
 const Categories = () => import(/* webpackChunkName: "Materials" */ '../components/materials/Category.vue')
 const Params = () => import(/* webpackChunkName: "Materials" */ '../components/materials/Params.vue')
@@ -45,7 +35,9 @@ const router = new VueRouter({
         { path: '/materials', component: Materials },
         { path: '/approve', component: Approve },
         { path: '/records', component: Records },
-        { path: '/logs', component: Log }
+        { path: '/logs', component: Log },
+        { path: '/privileges', component: Privilege },
+        { path: '/roles', component: Role }
       ]
     }
   ]

@@ -41,8 +41,8 @@
                          prop="email"></el-table-column>
         <el-table-column label="电话"
                          prop="mobile"></el-table-column>
-        <!-- <el-table-column label="角色"
-                         prop="role_name"></el-table-column> -->
+        <el-table-column label="角色"
+                         prop="roleName"></el-table-column>
         <el-table-column label="状态">
           <template slot-scope="scope">
             <el-switch v-model="scope.row.available"
@@ -160,13 +160,13 @@
                @close="setRoleDialogClosed">
       <div>
         <p>当前的用户：{{userInfo.username}}</p>
-        <p>当前的角色：{{userInfo.role_name}}</p>
+        <p>当前的角色：{{userInfo.roleName}}</p>
         <p>分配新角色：
           <el-select v-model="selectedRoleId"
                      placeholder="请选择">
             <el-option v-for="item in rolesList"
                        :key="item.id"
-                       :label="item.roleName"
+                       :label="item.name"
                        :value="item.id">
             </el-option>
           </el-select>
@@ -418,7 +418,7 @@ export default {
       this.userInfo = userInfo
 
       // 在展示对话框之前，获取所有角色的列表
-      const { data: res } = await this.$http.get('roles')
+      const { data: res } = await this.$http.get('role/list')
       if (res.meta.status !== 200) {
         return this.$message.error('获取角色列表失败！')
       }
@@ -434,10 +434,7 @@ export default {
       }
 
       const { data: res } = await this.$http.put(
-        `users/${this.userInfo.id}/role`,
-        {
-          rid: this.selectedRoleId
-        }
+        `account/${this.userInfo.id}/roleId/${this.selectedRoleId}`
       )
 
       if (res.meta.status !== 200) {

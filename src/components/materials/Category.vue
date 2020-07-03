@@ -25,47 +25,53 @@
                      :name='item.key'>
         </el-tab-pane>
         <!-- 表格 -->
-        <tree-table class="treeTable"
-                    :data="categoryList"
-                    :columns="columns"
-                    :selection-type="false"
-                    :expand-type="false"
-                    show-index
-                    index-text="序号"
-                    stripe
-                    :show-row-hover="false">
-          <!-- 排序 -->
-          <template slot="order"
-                    slot-scope="scope">
-            <el-tag size="mini"
-                    v-if="scope.row.level===1">一级</el-tag>
-            <el-tag type="success"
-                    size="mini"
-                    v-else-if="scope.row.level===2">二级</el-tag>
-            <el-tag type="warning"
-                    size="mini"
-                    v-else>三级</el-tag>
-          </template>
-          <!-- 是否有效 -->
-          <template slot="isok"
-                    slot-scope="scope">
-            <el-switch v-model="scope.row.available"
-                       @change="closeAvailable(scope.row)">
-            </el-switch>
-          </template>
-          <!-- 操作 -->
-          <template slot="opt"
-                    slot-scope="scope">
-            <el-button type="primary"
-                       icon="el-icon-edit"
-                       size="mini"
-                       @click="showEditDialog(scope.row.id)">编辑</el-button>
-            <el-button type="danger"
-                       icon="el-icon-delete"
-                       size="mini"
-                       @click="removeById(scope.row.id)">删除</el-button>
-          </template>
-        </tree-table>
+
+        <el-table :data="categoryList"
+                  row-key="id"
+                  style="width: 100%;margin-bottom: 20px;"
+                  border
+                  stripe
+                  default-expand-all
+                  :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+          <el-table-column prop="name"
+                           label="分类名称"
+                           sortable>
+          </el-table-column>
+          <el-table-column label="类别等级">
+            <!-- 排序 -->
+            <template slot-scope="scope">
+              <el-tag size="mini"
+                      v-if="scope.row.level===1">一级</el-tag>
+              <el-tag type="success"
+                      size="mini"
+                      v-else-if="scope.row.level===2">二级</el-tag>
+              <el-tag type="warning"
+                      size="mini"
+                      v-else>三级</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="是否有效">
+            <!-- 是否有效 -->
+            <template slot-scope="scope">
+              <el-switch v-model="scope.row.available"
+                         @change="closeAvailable(scope.row)">
+              </el-switch>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作">
+            <!-- 操作 -->
+            <template slot-scope="scope">
+              <el-button type="primary"
+                         icon="el-icon-edit"
+                         size="mini"
+                         @click="showEditDialog(scope.row.id)">编辑</el-button>
+              <el-button type="danger"
+                         icon="el-icon-delete"
+                         size="mini"
+                         @click="removeById(scope.row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
 
         <!-- 分页区域 -->
         <el-pagination @size-change="handleSizeChange"
@@ -159,34 +165,6 @@ export default {
       categoryList: [],
       // 总数据条数
       total: 0,
-      // 为table指定列的定义
-      columns: [
-        {
-          label: '分类名称',
-          prop: 'name'
-        },
-        {
-          label: '类别等级',
-          // 表示，将当前列定义为模板列
-          type: 'template',
-          // 表示当前这一列使用模板名称
-          template: 'order'
-        },
-        {
-          label: '是否有效',
-          // 表示，将当前列定义为模板列
-          type: 'template',
-          // 表示当前这一列使用模板名称
-          template: 'isok'
-        },
-        {
-          label: '操作',
-          // 表示，将当前列定义为模板列
-          type: 'template',
-          // 表示当前这一列使用模板名称
-          template: 'opt'
-        }
-      ],
       // 控制添加分类对话框的显示与隐藏
       addCategorygoryDialogVisible: false,
       // 添加分类的表单数据对象
