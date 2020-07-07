@@ -189,9 +189,9 @@ export default {
       },
       // 选中的父级分类的Id数组
       selectedKeys: [],
-      // 控制修改用户对话框的显示与隐藏
+      // 控制修改分类对话框的显示与隐藏
       editDialogVisible: false,
-      // 查询到的用户信息对象
+      // 查询到的分类信息对象
       editForm: {},
       specialLineList: {}
     }
@@ -322,7 +322,7 @@ export default {
         this.addCategorygoryDialogVisible = false
       })
     },
-    // 展示编辑用户的对话框
+    // 展示编辑分类的对话框
     async showEditDialog(id) {
       // console.log(id)
       const { data: res } = await this.$http.get('category/' + id)

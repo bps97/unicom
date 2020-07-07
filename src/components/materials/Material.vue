@@ -53,13 +53,15 @@
                          width="70px"></el-table-column>
         <el-table-column label="更新时间"
                          prop="updateTime"
+                         sortable
                          width="160px"></el-table-column>
         <el-table-column label="操作"
                          width="130px">
           <template slot-scope="scope">
             <el-button type="primary"
                        icon="el-icon-edit"
-                       size="mini"></el-button>
+                       size="mini"
+                       @click="showEditDialog(scope.row.id)"></el-button>
             <el-button type="danger"
                        icon="el-icon-delete"
                        size="mini"
@@ -78,6 +80,47 @@
                      :total="total"
                      background>
       </el-pagination>
+
+      <!-- 修改分类的对话框 -->
+      <el-dialog title="修改分类"
+                 :visible.sync="editDialogVisible"
+                 width="50%"
+                 @close="editDialogClosed">
+        <el-form :model="editForm"
+                 ref="editFormRef"
+                 label-width="70px">
+          <el-form-item label="名称">
+            <el-input v-model="editForm.name"></el-input>
+          </el-form-item>
+          <el-form-item label="专业线"
+                        prop="specialLine">
+            <el-input v-model="editForm.specialLine"
+                      disabled></el-input>
+          </el-form-item>
+          <el-form-item label="分类"
+                        prop="categoryName">
+            <el-input v-model="editForm.categoryName"
+                      disabled></el-input>
+          </el-form-item>
+          <el-form-item label="仓库"
+                        prop="repositoryName">
+            <el-input v-model="editForm.repositoryName"
+                      disabled></el-input>
+          </el-form-item>
+          <el-form-item label="数量"
+                        prop="count">
+            <el-input v-model="editForm.count"
+                      disabled></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer"
+              class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取 消</el-button>
+          <el-button type="primary"
+                     @click="editCategoryInfo">确 定</el-button>
+        </span>
+      </el-dialog>
+
       <!-- 添加物料的对话框 -->
       <el-dialog title="添加物料"
                  :visible.sync="addMaterialDialogVisible"
@@ -167,7 +210,10 @@ export default {
         name: '',
         repositoryId: '',
         categoryId: ''
-      }
+      },
+      editDialogVisible: false,
+      // 查询到的分类信息对象
+      editForm: {}
     }
   },
   created() {
@@ -250,7 +296,18 @@ export default {
       this.$message.success('删除成功！')
       this.listMaterials()
     },
+    // 展示编辑用户的对话框
+    async showEditDialog(id) {
+      // console.log(id)
+      const { data: res } = await this.$http.get('material/' + id)
 
+      if (res.meta.status !== 200) {
+        return this.$message.error('查询分类信息失败！')
+      }
+
+      this.editForm = res.data
+      this.editDialogVisible = true
+    },
     // 点击按钮，添加新的物料
     addMaterial() {
       this.$refs.addMaterialFormRef.validate(async valid => {
@@ -298,6 +355,30 @@ export default {
       this.materialList = res.data.records
       console.log(this.materialList)
       this.total = res.data.total
+    },
+
+    // 修改物料信息并提交
+    editCategoryInfo() {
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) return
+        // 发起修改用户信息的数据请求
+        const { data: res } = await this.$http.put(
+          'material/' + this.editForm.id,
+          {
+            name: this.editForm.name
+          }
+        )
+
+        if (res.meta.status !== 200) {
+          return this.$message.error('更新物料信息失败！')
+        }
+        // 提示修改成功
+        this.$message.success('更新物料信息成功！')
+        // 关闭对话框
+        this.editDialogVisible = false
+        // 刷新数据列表
+        this.listMaterials()
+      })
     }
   }
 }

@@ -13,7 +13,7 @@ const Categories = () => import(/* webpackChunkName: "Materials" */ '../componen
 const Params = () => import(/* webpackChunkName: "Materials" */ '../components/materials/Params.vue')
 const Materials = () => import(/* webpackChunkName: "Materials" */ '../components/materials/Material.vue')
 
-const Approve = () => import(/* webpackChunkName: "Records" */ '../components/record/Approve.vue')
+const Upload = () => import(/* webpackChunkName: "Records" */ '../components/record/Upload.vue')
 const Records = () => import(/* webpackChunkName: "Records" */ '../components/record/Record.vue')
 const Log = () => import(/* webpackChunkName: "Records" */ '../components/log/Log.vue')
 
@@ -33,7 +33,7 @@ const router = new VueRouter({
         { path: '/categories', component: Categories },
         { path: '/params', component: Params },
         { path: '/materials', component: Materials },
-        { path: '/approve', component: Approve },
+        { path: '/excel', component: Upload },
         { path: '/records', component: Records },
         { path: '/logs', component: Log },
         { path: '/privileges', component: Privilege },
