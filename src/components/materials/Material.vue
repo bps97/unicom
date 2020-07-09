@@ -44,17 +44,21 @@
                          prop="name"></el-table-column>
         <el-table-column label="专业线"
                          prop="specialLine"
-                         width="95px"></el-table-column>
+                         width="80px"></el-table-column>
         <el-table-column label="仓库"
                          prop="repositoryName"
-                         width="95px"></el-table-column>
+                         width="80px"></el-table-column>
         <el-table-column label="物料数量"
                          prop="count"
-                         width="70px"></el-table-column>
+                         width="80px"></el-table-column>
+        <el-table-column label="损坏状态"
+                         prop="status"
+                         width="80px"></el-table-column>
         <el-table-column label="更新时间"
                          prop="updateTime"
                          sortable
-                         width="160px"></el-table-column>
+                         width="160px">
+        </el-table-column>
         <el-table-column label="操作"
                          width="130px">
           <template slot-scope="scope">
@@ -151,7 +155,7 @@
                          :value="item.key"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="物料：">
+          <el-form-item label="物料名称：">
             <el-input prop="name"
                       v-model="addMaterialForm.name"></el-input>
           </el-form-item>

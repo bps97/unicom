@@ -69,6 +69,12 @@
                                type="textarea">
               </el-autocomplete>
             </el-form-item>
+            <el-form-item>
+              <el-radio v-model="recordForm.status"
+                        label="正常">正常</el-radio>
+              <el-radio v-model="recordForm.status"
+                        label="损坏">损坏</el-radio>
+            </el-form-item>
             <el-form-item label="物料数量">
               <el-col :span='8'>
                 <el-slider v-model="recordForm.count"
@@ -166,7 +172,8 @@ export default {
         message: '',
         count: 1,
         repositoryId: '',
-        categoryId: ''
+        categoryId: '',
+        status: '正常'
       },
       queryInfo: {
         categoryId: '',

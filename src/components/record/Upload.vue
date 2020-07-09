@@ -9,41 +9,160 @@
 
     <!-- 卡片视图区域 -->
     <el-card>
-      <el-upload ref="upload"
-                 class="uploadAssets"
-                 drag
-                 action=""
-                 :http-request="uploadSuccess"
-                 :limit="1"
-                 accept=".xls,.xlsx"
-                 :before-upload="beforeUpload"
-                 :show-file-list="showFileList"
-                 :on-exceed="handleExceed">
-        <i class="el-icon-receiving"></i>
-        <div class="el-upload__text">点击或将文件拖拽到这里上传<br />支持扩展名：.xls、.xlsx（仅支持1个文件）</div>
-      </el-upload>
-      <el-button type="primary"
-                 size="mini"
-                 @click="uploadFile">导入</el-button>
+      <!-- 步骤条区域 -->
+      <el-steps :active="activeIndex - 0"
+                finish-status="success"
+                align-center>
+        <el-step title="文件上传"></el-step>
+        <el-step title="上传情况"></el-step>
+
+      </el-steps>
+      <el-form ref="excelForm"
+               :model="excelForm"
+               label-width="80px">
+        <el-tabs v-model="activeIndex"
+                 :tab-position="'left'"
+                 :before-leave="beforeTabLeave">
+          <el-tab-pane label="文件上传"
+                       name="0">
+            <el-row>
+              <el-col :span="6"
+                      :offset="1">
+                <el-upload ref="upload"
+                           class="uploadAssets"
+                           drag
+                           action=""
+                           :http-request="uploadSuccess"
+                           :limit="1"
+                           accept=".xls,.xlsx"
+                           :before-upload="beforeUpload"
+                           :show-file-list="true"
+                           :on-exceed="handleExceed"
+                           v-loading="loading">
+                  <i class="el-icon-receiving"></i>
+                  <div class="el-upload__text">点击或将文件拖拽到这里上传<br />支持扩展名：.xls、.xlsx（仅支持1个文件）</div>
+
+                </el-upload>
+              </el-col>
+              <el-col :span="4"
+                      :offset="2">
+                <el-button type="primary"
+                           v-loading="loading"
+                           @click="uploadFile">导入</el-button>
+              </el-col>
+            </el-row>
+
+          </el-tab-pane>
+          <el-tab-pane label="上传情况"
+                       name="1">
+            <el-row>
+              <el-col :span="17"
+                      :offset="1">
+                <el-table :data="materialList"
+                          height="600px"
+                          border
+                          style="width: 100%"
+                          :row-class-name="tableRowClassName">
+                  <el-table-column prop="materialName"
+                                   label="物料全称"
+                                   :width='400'>
+                  </el-table-column>
+                  <el-table-column prop="repositoryName"
+                                   label="仓库位置">
+                  </el-table-column>
+                  <el-table-column prop="categoryName"
+                                   label="物料分类">
+                  </el-table-column>
+                  <el-table-column prop="status"
+                                   label="物料状态">
+                  </el-table-column>
+                  <el-table-column prop="count"
+                                   label="物料数量">
+                  </el-table-column>
+                </el-table>
+              </el-col>
+              <el-col :span="5">
+                <el-row>
+                  <el-col :offset="6">备注信息：</el-col>
+                </el-row>
+                <br>
+                <el-row>
+                  <el-form-item>
+                    <el-input type="textarea"
+                              placeholder="请输入内容(可为空)"
+                              :rows="22"
+                              v-model="excelForm.message"></el-input>
+                  </el-form-item>
+                </el-row>
+                <el-row>
+                  <el-form-item>
+                    <el-button type="primary"
+                               @click="onSubmit">确认无误</el-button>
+                  </el-form-item>
+                </el-row>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :offset="1">
+                <!-- 分页区域 -->
+                <el-pagination @size-change="handleSizeChange"
+                               @current-change="handleCurrentChange"
+                               :current-page="queryInfo.page"
+                               :page-sizes="[3, 5, 10, 15]"
+                               :page-size="queryInfo.size"
+                               layout="total, sizes, prev, pager, next, jumper"
+                               :total="total">
+                </el-pagination>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+        </el-tabs>
+      </el-form>
     </el-card>
-
   </div>
-
 </template>
 
 <script>
 export default {
   data() {
     return {
-      fileList: []
+      filesList: [],
+      loading: false,
+      materialList: [],
+      activeIndex: '0',
+      total: 0,
+      queryInfo: {
+        size: 10,
+        page: 0
+      },
+      excelForm: {
+        message: ''
+      }
     }
   },
+
   // 钩子函数,页面加载执行
   created: function() {},
   // 钩子函数,页面加载完成后执行
   mounted() {},
   // 函数方法
   methods: {
+    tableRowClassName({ row, rowIndex }) {
+      if (row.status === '损坏') {
+        return 'danger-row'
+      }
+      return ''
+    },
+    // 监听 size 改变
+    handleSizeChange(newSize) {
+      this.queryInfo.size = newSize
+      this.listMaterials()
+    },
+    // 监听 page 改变
+    handleCurrentChange(newPage) {
+      this.queryInfo.page = newPage
+      this.listMaterials()
+    },
     // 上传文件之前判断文件类型
     beforeUpload(file) {
       let isText = file.type === 'application/vnd.ms-excel'
@@ -65,11 +184,36 @@ export default {
 
       this.fileName = file.file.name
     },
+    async listMaterials() {
+      const { data: res } = await this.$http.get('/applyItem/list', {
+        params: {
+          current: this.queryInfo.page,
+          size: this.queryInfo.size
+        }
+      })
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取物料列表失败！')
+      }
+      this.materialList = res.data.records
+      this.total = res.data.total
+    },
+    async onSubmit() {
+      const { data: res } = await this.$http.post('apply/message', {
+        message: this.excelForm.message
+      })
+      if (res.meta.status !== 200) {
+        return this.$message.error('失败！')
+      }
+      // this.materialList = res.data.records
+      // this.total = res.data.total
+      return this.$message.success('同步完成！')
+    },
     // 提交申请单
     uploadFile() {
+      this.loading = true
       this.$http({
         method: 'post',
-        url: 'upload',
+        url: 'applyItem/upload',
         headers: { AccessToken: window.sessionStorage.getItem('token') },
         params: {
           contents: this.contents
@@ -85,14 +229,38 @@ export default {
           } else if (res.data.meta.status === 201) {
           }
           console.log(res.data)
+          this.materialList = res.data.data.records
+          this.total = res.data.data.total
+          this.loading = false
+          this.$refs.upload.clearFiles()
+          this.filesList = []
+          this.activeIndex = '1'
         })
         .catch(err => {
           this.$message.error(err)
+          this.$message.error('导入失败！')
+          this.loading = false
         })
+    },
+    // 检测页签变化
+    beforeTabLeave(activeName, oldActiveName) {
+      if (activeName === '1') {
+        if (this.materialList.length === 0) {
+          this.listMaterials()
+        }
+      }
+      return true
     }
   }
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
+.el-table .danger-row {
+  background: #fde2e2;
+}
+
+.el-table .success-row {
+  background: #e1f3d8;
+}
 </style>
