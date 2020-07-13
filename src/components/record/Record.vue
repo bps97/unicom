@@ -173,7 +173,8 @@ export default {
         count: 1,
         repositoryId: '',
         categoryId: '',
-        status: '正常'
+        status: '正常',
+        type: '领用'
       },
       queryInfo: {
         categoryId: '',
@@ -282,7 +283,8 @@ export default {
     // 提交申请单
     async submitApplyForm() {
       const { data: res } = await this.$http.post('apply/message', {
-        message: this.recordForm.message
+        message: this.recordForm.message,
+        type: this.recordForm.type
       })
       if (res.meta.status !== 200) {
         return this.$message.error('提交申请失败！')

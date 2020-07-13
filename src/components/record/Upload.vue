@@ -26,7 +26,7 @@
           <el-tab-pane label="文件上传"
                        name="0">
             <el-row>
-              <el-col :span="6"
+              <el-col :span="8"
                       :offset="1">
                 <el-upload ref="upload"
                            class="uploadAssets"
@@ -136,7 +136,8 @@ export default {
         page: 0
       },
       excelForm: {
-        message: ''
+        message: '',
+        type: '批量导入'
       }
     }
   },
@@ -199,10 +200,11 @@ export default {
     },
     async onSubmit() {
       const { data: res } = await this.$http.post('apply/message', {
-        message: this.excelForm.message
+        message: this.excelForm.message,
+        type: this.excelForm.type
       })
       if (res.meta.status !== 200) {
-        return this.$message.error('失败！')
+        return this.$message.error(res.meta.message)
       }
       // this.materialList = res.data.records
       // this.total = res.data.total
