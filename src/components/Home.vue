@@ -19,7 +19,7 @@
           </el-menu-item>
         </el-submenu>
         <el-menu-item index="2">
-          <a href="https://www.10010.com/"
+          <a href="#"
              target="_blank">关于我们</a>
         </el-menu-item>
       </el-menu>

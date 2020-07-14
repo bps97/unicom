@@ -86,7 +86,7 @@
       </el-pagination>
 
       <!-- 修改分类的对话框 -->
-      <el-dialog title="修改分类"
+      <el-dialog title="修改物料"
                  :visible.sync="editDialogVisible"
                  width="50%"
                  @close="editDialogClosed">

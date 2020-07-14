@@ -31,8 +31,6 @@
                   style="width: 100%;margin-bottom: 20px;"
                   border
                   stripe
-                  lazy
-                  default-expand-all
                   :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
           <el-table-column prop="name"
                            label="分类名称"
