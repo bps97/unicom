@@ -9,11 +9,17 @@
 
     <!-- 卡片视图区域 -->
     <el-card>
-
       <el-row>
         <el-col>
-          <el-button type="primary"
-                     @click="showAddCategoryDialog">添加分类</el-button>
+          <el-popover placement="right"
+                      title="点击添加『物料分类』"
+                      trigger="hover"
+                      content="注意分类命名要有辨识度">
+            <el-button type="primary"
+                       slot="reference"
+                       @click="showAddCategoryDialog">添加分类</el-button>
+          </el-popover>
+
         </el-col>
       </el-row>
       <!-- tab 页签区域 -->
@@ -30,9 +36,8 @@
                   row-key="id"
                   style="width: 100%;margin-bottom: 20px;"
                   border
+                  height="484"
                   stripe
-                  lazy
-                  default-expand-all
                   :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
           <el-table-column prop="name"
                            label="分类名称"
@@ -78,7 +83,7 @@
         <el-pagination @size-change="handleSizeChange"
                        @current-change="handleCurrentChange"
                        :current-page="queryInfo.page"
-                       :page-sizes="[3, 5, 10, 15]"
+                       :page-sizes="[5, 8, 10, 15]"
                        :page-size="queryInfo.size"
                        layout="total, sizes, prev, pager, next, jumper"
                        :total="total">
@@ -159,7 +164,7 @@ export default {
       // 查询条件
       queryInfo: {
         page: 1,
-        size: 5
+        size: 8
       },
       activeName: '1271005839779250177',
       // 商品分类的数据列表，默认为空
@@ -272,7 +277,7 @@ export default {
 
     // 获取商品分类数据
     async listCategories() {
-      const { data: res } = await this.$http.get('category', {
+      const { data: res } = await this.$http.get('category/list', {
         params: {
           current: this.queryInfo.page,
           size: this.queryInfo.size,

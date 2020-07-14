@@ -31,7 +31,8 @@
       <!-- 用户列表区域 -->
       <el-table :data="userList"
                 border
-                stripe>
+                stripe
+                height="484">
         <el-table-column type="index"></el-table-column>
         <el-table-column label="账号"
                          prop="username"></el-table-column>
@@ -81,7 +82,7 @@
       <el-pagination @size-change="handleSizeChange"
                      @current-change="handleCurrentChange"
                      :current-page="queryInfo.current"
-                     :page-sizes="[1, 2, 5, 10]"
+                     :page-sizes="[1, 5, 8, 10]"
                      :page-size="queryInfo.size"
                      layout="total, sizes, prev, pager, next, jumper"
                      :total="total">
@@ -215,7 +216,7 @@ export default {
         // 当前的页数
         current: 1,
         // 当前每页显示多少条数据
-        size: 5
+        size: 8
       },
       userList: [],
       total: 0,

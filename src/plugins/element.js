@@ -4,7 +4,7 @@ import {
   Submenu, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col, Table, TableColumn,
   Switch, Tooltip, Pagination, Dialog, MessageBox, Tag, Cascader, Alert, Tabs, TabPane,
   Steps, Step, CheckboxGroup, CheckboxButton, Upload, Select, Option, Timeline, TimelineItem,
-  Autocomplete, Slider, Radio, Loading
+  Autocomplete, Slider, Radio, Loading, Popover
 } from 'element-ui'
 
 Vue.use(Button)
@@ -47,5 +47,6 @@ Vue.use(Autocomplete)
 Vue.use(Slider)
 Vue.use(Radio)
 Vue.use(Loading)
+Vue.use(Popover)
 Vue.prototype.$message = Message // 全局挂载
 Vue.prototype.$confirm = MessageBox.confirm

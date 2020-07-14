@@ -4,7 +4,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>审批流程</el-breadcrumb-item>
-      <el-breadcrumb-item>日志录入</el-breadcrumb-item>
+      <el-breadcrumb-item>领用录入</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图区域 -->
     <el-card>
@@ -289,6 +289,7 @@ export default {
       if (res.meta.status !== 200) {
         return this.$message.error('提交申请失败！')
       }
+      this.$message.success('申请成功!')
       this.activeIndex = '0'
     },
     // 获取物料列表

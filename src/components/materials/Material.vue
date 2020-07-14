@@ -30,15 +30,22 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary"
-                     @click="showAddMaterialDialog">添加物料</el-button>
+          <el-popover placement="right"
+                      title="点击添加『物料』"
+                      trigger="hover"
+                      content="注意此处添加物料并不会修改仓库内物料数量">
+            <el-button type="primary"
+                       slot="reference"
+                       @click="showAddCategoryDialog">添加分类</el-button>
+          </el-popover>
         </el-col>
       </el-row>
       <br>
       <!-- table表格区域 -->
       <el-table :data="materialList"
                 border
-                stripe>
+                stripe
+                height="484">
         <el-table-column type="index"></el-table-column>
         <el-table-column label="物料名称"
                          prop="name"></el-table-column>
@@ -78,15 +85,15 @@
       <el-pagination @size-change="handleSizeChange"
                      @current-change="handleCurrentChange"
                      :current-page="queryInfo.pagenum"
-                     :page-sizes="[5, 10, 15, 20]"
-                     :page-size="queryInfo.pagesize"
+                     :page-sizes="[5, 8, 10, 15]"
+                     :page-size="queryInfo.size"
                      layout="total, sizes, prev, pager, next, jumper"
                      :total="total"
                      background>
       </el-pagination>
 
       <!-- 修改分类的对话框 -->
-      <el-dialog title="修改分类"
+      <el-dialog title="修改物料"
                  :visible.sync="editDialogVisible"
                  width="50%"
                  @close="editDialogClosed">
@@ -180,7 +187,7 @@ export default {
       queryInfo: {
         key: '',
         page: 1,
-        size: 10,
+        size: 8,
         categoryId: ''
       },
       // 仓库列表

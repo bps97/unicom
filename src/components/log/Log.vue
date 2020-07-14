@@ -94,7 +94,7 @@ export default {
       // 查询条件
       queryInfo: {
         page: 1,
-        size: 3
+        size: 10
       },
       // 商品分类的数据列表，默认为空
       total: 0,
