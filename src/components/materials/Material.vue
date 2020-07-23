@@ -36,7 +36,7 @@
                       content="注意此处添加物料并不会修改仓库内物料数量">
             <el-button type="primary"
                        slot="reference"
-                       @click="showAddCategoryDialog">添加分类</el-button>
+                       @click="showAddMaterialDialog">添加分类</el-button>
           </el-popover>
         </el-col>
       </el-row>
@@ -67,8 +67,9 @@
                          width="160px">
         </el-table-column>
         <el-table-column label="操作"
-                         width="130px">
+                         width="200px">
           <template slot-scope="scope">
+
             <el-button type="primary"
                        icon="el-icon-edit"
                        size="mini"
@@ -77,6 +78,12 @@
                        icon="el-icon-delete"
                        size="mini"
                        @click="removeById(scope.row.id)"></el-button>
+
+            <el-button type="success"
+                       icon="el-icon-view"
+                       size="mini"
+                       @click="showRecordDialog(scope.row.id)"></el-button>
+
           </template>
         </el-table-column>
       </el-table>
@@ -152,7 +159,7 @@
                          @change="parentCategoryChanged_add">
             </el-cascader>
           </el-form-item>
-          <el-form-item label="仓库位置"
+          <el-form-item label="仓库位置："
                         prop="repositoryId">
             <el-select v-model="addMaterialForm.repositoryId"
                        placeholder="请选择仓库">
@@ -173,6 +180,35 @@
           <el-button type="primary"
                      @click="addMaterial">确 定</el-button>
         </span>
+      </el-dialog>
+
+      <el-dialog title="日志信息"
+                 :visible.sync="recordDialogVisible">
+        <div class="block">
+          <el-timeline>
+            <el-timeline-item timestamp="2018/4/12"
+                              placement="top">
+              <el-card>
+                <h4>更新 Github 模板</h4>
+                <p>王小虎 提交于 2018/4/12 20:46</p>
+              </el-card>
+            </el-timeline-item>
+            <el-timeline-item timestamp="2018/4/3"
+                              placement="top">
+              <el-card>
+                <h4>更新 Github 模板</h4>
+                <p>王小虎 提交于 2018/4/3 20:46</p>
+              </el-card>
+            </el-timeline-item>
+            <el-timeline-item timestamp="2018/4/2"
+                              placement="top">
+              <el-card>
+                <h4>更新 Github 模板</h4>
+                <p>王小虎 提交于 2018/4/2 20:46</p>
+              </el-card>
+            </el-timeline-item>
+          </el-timeline>
+        </div>
       </el-dialog>
     </el-card>
 
@@ -223,6 +259,7 @@ export default {
         categoryId: ''
       },
       editDialogVisible: false,
+      recordDialogVisible: false,
       // 查询到的分类信息对象
       editForm: {}
     }
@@ -307,17 +344,28 @@ export default {
       this.$message.success('删除成功！')
       this.listMaterials()
     },
-    // 展示编辑用户的对话框
+    // 展示编辑用户的弹框
     async showEditDialog(id) {
       // console.log(id)
       const { data: res } = await this.$http.get('material/' + id)
 
       if (res.meta.status !== 200) {
-        return this.$message.error('查询分类信息失败！')
+        return this.$message.error('获取物料信息失败！')
       }
 
       this.editForm = res.data
       this.editDialogVisible = true
+    }, // 展示日志信息的弹框
+    async showRecordDialog(id) {
+      // console.log(id)
+      // const { data: res } = await this.$http.get('material/' + id)
+
+      // if (res.meta.status !== 200) {
+      //   return this.$message.error('获取物料信息失败！')
+      // }
+
+      // this.editForm = res.data
+      this.recordDialogVisible = true
     },
     // 点击按钮，添加新的物料
     addMaterial() {
@@ -360,7 +408,8 @@ export default {
         }
       })
       if (res.meta.status !== 200) {
-        return this.$message.error('获取商品列表失败！')
+        this.materialList = undefined
+        return this.$message.error(res.meta.message)
       }
       this.$message.success('获取商品列表成功！')
       this.materialList = res.data.records

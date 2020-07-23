@@ -46,28 +46,49 @@
       <el-row>
         <!-- 日志列表区域 -->
         <el-table :data="recordList"
-                  border
-                  stripe>
-          <el-table-column type="index"></el-table-column>
-          <el-table-column label="物料名称"
-                           prop="materialName"
-                           width="400"></el-table-column>
-          <el-table-column label="物料数量"
-                           prop="count"></el-table-column>
-          <el-table-column label="分类类型"
-                           prop="categoryName"></el-table-column>
-          <el-table-column label="申请用户"
-                           sortable
-                           prop="userName"></el-table-column>
-          <el-table-column label="记录类型"
-                           sortable
-                           prop="type"></el-table-column>
-          <el-table-column label="备注信息"
-                           prop="message"></el-table-column>
+                  row-key="id"
+                  border="false"
+                  :cell-class-name="tableRowClassName"
+                  :tree-props="{children: 'children'}">
+          <el-table-column label="工单"
+                           align="center">
+
+            <el-table-column label="申请理由"
+                             prop="message"></el-table-column>
+            <el-table-column label="申请用户"
+                             sortable
+                             width="100"
+                             prop="userName"></el-table-column>
+            <el-table-column label="记录类型"
+                             sortable
+                             width="100"
+                             prop="type"></el-table-column>
+
+          </el-table-column>
+
           <el-table-column label="工单时间"
                            sortable
+                           align="center"
                            prop="createTime"
                            width="100"></el-table-column>
+          <el-table-column label="物料"
+                           align="center">
+            <el-table-column label="名称"
+                             prop="materialName"
+                             align="center"
+                             width="400">
+
+            </el-table-column>
+            <el-table-column label="状态"
+                             align="center"
+                             prop="status"
+                             width="80"></el-table-column>
+          </el-table-column>
+          <el-table-column label="物料数量"
+                           prop="count"
+                           width="80"></el-table-column>
+          <el-table-column label="分类类型"
+                           prop="categoryName"></el-table-column>
 
         </el-table>
       </el-row>
@@ -112,6 +133,18 @@ export default {
     console.log(this.activeName)
   },
   methods: {
+    tableRowClassName({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex > 3 && columnIndex < 6) {
+        if (row.children !== null) {
+          if (row.children.length > 0) {
+            // return 'warning-row'
+          }
+        } else {
+          return 'success-row'
+        }
+      }
+      return 'none-border'
+    },
     // 切换标签
     shiftTabs() {
       // console.log(this.activeName)
@@ -149,7 +182,8 @@ export default {
         }
       })
       if (res.meta.status !== 200) {
-        return this.$message.error('获取记录列表失败！')
+        this.recordList = undefined
+        return this.$message.error(res.meta.message)
       }
 
       // console.log(res.data)
@@ -160,12 +194,27 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less" >
 .treeTable {
   margin-top: 15px;
 }
 
 .el-cascader {
   width: 100%;
+}
+.el-table .warning-row {
+  background: oldlace;
+  border-left: none;
+  border-right: none;
+}
+
+.el-table .success-row {
+  background: #f0f9eb;
+  border-left: none;
+  border-right: none;
+}
+.el-table .none-border {
+  border-left: none;
+  border-right: none;
 }
 </style>

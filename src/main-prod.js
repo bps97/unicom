@@ -8,7 +8,8 @@ import './assets/css/global.css'
 
 import axios from 'axios'
 // 配置请求的根路径
-axios.defaults.baseURL = 'http://bps.cool:8101'
+// axios.defaults.baseURL = 'http://bps.cool:8101'
+axios.defaults.baseURL = 'http://10.22.34.148:8101'
 // axios.defaults.baseURL = 'http://localhost:8101'
 axios.interceptors.request.use(config => {
   config.headers.token = window.sessionStorage.getItem('token')

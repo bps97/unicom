@@ -79,6 +79,17 @@
                   <el-table-column prop="count"
                                    label="物料数量">
                   </el-table-column>
+                  <el-table-column fixed="right"
+                                   label="操作"
+                                   width="120">
+                    <template slot-scope="scope">
+                      <el-button @click.native.prevent="deleteRow(scope.$index, materialList)"
+                                 type="text"
+                                 size="small">
+                        移除
+                      </el-button>
+                    </template>
+                  </el-table-column>
                 </el-table>
               </el-col>
               <el-col :span="5">
@@ -208,6 +219,8 @@ export default {
       }
       // this.materialList = res.data.records
       // this.total = res.data.total
+      this.activeIndex = '0'
+      this.materialList = undefined
       return this.$message.success('同步完成！')
     },
     // 提交申请单
@@ -228,7 +241,8 @@ export default {
           if (res.data.meta.status === 200) {
             // 提示修改成功
             this.$message.success('导入成功！')
-          } else if (res.data.meta.status === 201) {
+          } else if (res.data.meta.status === 500) {
+            this.$message.error(res.data.meta.message)
           }
           console.log(res.data)
           this.materialList = res.data.data.records
@@ -239,10 +253,22 @@ export default {
           this.activeIndex = '1'
         })
         .catch(err => {
+          console.log(err)
           this.$message.error(err)
-          this.$message.error('导入失败！')
+          // this.$message.error('导入失败！')
           this.loading = false
         })
+    },
+    async removeItem(id) {
+      const { data: res } = await this.$http.delete('applyItem/' + id)
+
+      if (res.meta.status !== 200) {
+        return this.$message.error('删除失败！')
+      }
+    },
+    deleteRow(index, rows) {
+      this.removeItem(rows[index].id)
+      rows.splice(index, 1)
     },
     // 检测页签变化
     beforeTabLeave(activeName, oldActiveName) {
