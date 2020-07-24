@@ -31,7 +31,6 @@
                                     :label="tp"
                                     :key="tp"
                                     border>{{tp}}</el-checkbox-button>
-
               </el-checkbox-group>
 
             </div>

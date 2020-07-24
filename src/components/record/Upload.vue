@@ -62,7 +62,7 @@
                           height="600px"
                           border
                           style="width: 100%"
-                          :row-class-name="tableRowClassName">
+                          :cell-class-name="tableRowClassName">
                   <el-table-column prop="materialName"
                                    label="物料全称"
                                    :width='400'>
@@ -70,18 +70,18 @@
                   <el-table-column prop="repositoryName"
                                    label="仓库位置">
                   </el-table-column>
-                  <el-table-column prop="categoryName"
+                  <el-table-column prop="categoryName" align="center"
                                    label="物料分类">
                   </el-table-column>
-                  <el-table-column prop="status"
+                  <el-table-column prop="status" align="center" width="50px"
                                    label="物料状态">
                   </el-table-column>
-                  <el-table-column prop="count"
+                  <el-table-column prop="count" align="center"
                                    label="物料数量">
                   </el-table-column>
                   <el-table-column fixed="right"
                                    label="操作"
-                                   width="120">
+                                   width="50">
                     <template slot-scope="scope">
                       <el-button @click.native.prevent="deleteRow(scope.$index, materialList)"
                                  type="text"
@@ -149,19 +149,22 @@ export default {
       excelForm: {
         message: '',
         type: '批量导入'
+      },
+      contents: {
+        type: '批量导入'
       }
     }
   },
 
   // 钩子函数,页面加载执行
-  created: function() {},
+  created: function () {},
   // 钩子函数,页面加载完成后执行
   mounted() {},
   // 函数方法
   methods: {
-    tableRowClassName({ row, rowIndex }) {
-      if (row.status === '损坏') {
-        return 'danger-row'
+    tableRowClassName({ row, column, rowIndex, columnIndex }) {
+      if (column.label === '物料状态') {
+        if (row.status === '正常') { return 'success-row' } else { return 'danger-row' }
       }
       return ''
     },
@@ -230,12 +233,10 @@ export default {
         method: 'post',
         url: 'applyItem/upload',
         headers: { AccessToken: window.sessionStorage.getItem('token') },
-        params: {
-          contents: this.contents
-        },
-        data: this.filesList
+        data: this.filesList,
+        params: this.contents
       })
-        .then(res => {
+        .then((res) => {
           console.log(res)
           // let data = JSON.parse(aesDecrypt(res.data.content))
           if (res.data.meta.status === 200) {
@@ -252,7 +253,7 @@ export default {
           this.filesList = []
           this.activeIndex = '1'
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err)
           this.$message.error(err)
           // this.$message.error('导入失败！')

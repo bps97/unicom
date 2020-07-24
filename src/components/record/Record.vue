@@ -103,19 +103,21 @@
               <el-table-column prop="materialName"
                                label="物料名称">
               </el-table-column>
-              <el-table-column prop="specialLine"
-                               label="专业线"
-                               width="100">
+              <el-table-column prop="status" width="50px" align="center"
+                               label="物料状态">
               </el-table-column>
-              <el-table-column prop="categoryName"
-                               label="所属分类"
-                               width="100">
+              <el-table-column prop="specialLine" width="50px" align="center"
+                               label="专业线"
+                               >
               </el-table-column>
               <el-table-column prop="repositoryName"
                                label="所在仓库"
                                width="100">
               </el-table-column>
-
+              <el-table-column prop="categoryName"
+                               label="所属分类" align="center"
+                               >
+              </el-table-column>
               <el-table-column prop="count"
                                label="数量"
                                width="100">
