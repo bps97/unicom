@@ -16,8 +16,7 @@
       <el-tab-pane v-for='item in repositoryList'
                    :key='item.key'
                    :label='item.value'
-                   :name='item.key'>
-      </el-tab-pane>
+                   :name='item.key' />
       <el-row>
         <el-col :span="20">
           <el-form ref="logForm"
@@ -53,41 +52,38 @@
                            align="center">
 
             <el-table-column label="申请理由"
-                             prop="message"></el-table-column>
+                             prop="message" />
             <el-table-column label="申请用户"
                              sortable
                              width="100"
-                             prop="userName"></el-table-column>
+                             prop="userName" />
             <el-table-column label="记录类型"
                              sortable
                              width="100"
-                             prop="type"></el-table-column>
+                             prop="type" />
 
           </el-table-column>
-
           <el-table-column label="工单时间"
                            sortable
                            align="center"
                            prop="createTime"
-                           width="100"></el-table-column>
+                           width="100" />
           <el-table-column label="物料"
                            align="center">
             <el-table-column label="名称"
                              prop="materialName"
                              align="center"
-                             width="400">
-
-            </el-table-column>
+                             width="400" />
             <el-table-column label="状态"
                              align="center"
                              prop="status"
-                             width="80"></el-table-column>
+                             width="80" />
           </el-table-column>
           <el-table-column label="物料数量"
                            prop="count"
-                           width="80"></el-table-column>
+                           width="80" />
           <el-table-column label="分类类型"
-                           prop="categoryName"></el-table-column>
+                           prop="categoryName" />
 
         </el-table>
       </el-row>
@@ -99,17 +95,17 @@
                      :page-sizes="[3, 5, 10, 15]"
                      :page-size="queryInfo.size"
                      layout="total, sizes, prev, pager, next, jumper"
-                     :total="total">
-      </el-pagination>
+                     :total="total" />
     </el-tabs>
     <br>
   </div>
 </template>
 
 <script>
-const logTypes = ['无线', '线路', '网管', '动力', '装维']
+const logTypes = ['无线', '线路', '装维', '传输', '数据', '大客户', '接入']
+
 export default {
-  data() {
+  data () {
     return {
       // 查询条件
       queryInfo: {
@@ -127,12 +123,12 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     this.listRepositories()
     console.log(this.activeName)
   },
   methods: {
-    tableRowClassName({ row, column, rowIndex, columnIndex }) {
+    tableRowClassName ({ row, column, rowIndex, columnIndex }) {
       if (columnIndex > 3 && columnIndex < 6) {
         if (row.children !== null) {
           if (row.children.length > 0) {
@@ -145,7 +141,7 @@ export default {
       return 'none-border'
     },
     // 切换标签
-    shiftTabs() {
+    shiftTabs () {
       // console.log(this.activeName)
       // this.cateData.forEach(item => console.log(item.id))
       // var temp = this.cateData.filter(item => item.id === this.activeName)[0]
@@ -154,23 +150,24 @@ export default {
     },
 
     // 监听 size 改变
-    handleSizeChange(newSize) {
+    handleSizeChange (newSize) {
       this.queryInfo.size = newSize
       this.searchLog()
     },
     // 监听 page 改变
-    handleCurrentChange(newPage) {
+    handleCurrentChange (newPage) {
       this.queryInfo.page = newPage
       this.searchLog()
     },
-    async listRepositories() {
+    async listRepositories () {
       const { data: res } = await this.$http.get('repository/names')
+
       if (res.meta.status !== 200) {
         return this.$message.error('获取仓库列表失败！')
       }
       this.repositoryList = res.data
     },
-    async searchLog() {
+    async searchLog () {
       // 提交申请单
       const { data: res } = await this.$http.get('record', {
         params: {
@@ -180,6 +177,7 @@ export default {
           specialLines: this.logForm.checkedspecialLine.toString()
         }
       })
+
       if (res.meta.status !== 200) {
         this.recordList = undefined
         return this.$message.error(res.meta.message)

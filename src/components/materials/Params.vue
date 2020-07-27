@@ -193,7 +193,7 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       // 商品分类列表
       cateList: [],
@@ -235,12 +235,12 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     this.getcateList()
   },
   methods: {
     // 获取所有的商品分类列表
-    async getcateList() {
+    async getcateList () {
       const { data: res } = await this.$http.get('category/menus')
       if (res.meta.status !== 200) {
         return this.$message.error('获取商品分类失败！')
@@ -251,16 +251,16 @@ export default {
       console.log(this.cateList)
     },
     // 级联选择框选中项变化，会触发这个函数
-    handleChange() {
+    handleChange () {
       this.getParamsData()
     },
     // tab 页签点击事件的处理函数
-    handleTabClick() {
+    handleTabClick () {
       console.log(this.activeName)
       this.getParamsData()
     },
     // 获取参数的列表数据
-    async getParamsData() {
+    async getParamsData () {
       // 证明选中的不是三级分类
       if (this.selectedCateKeys.length !== 3) {
         this.selectedCateKeys = []
@@ -299,11 +299,11 @@ export default {
       }
     },
     // 监听添加对话框的关闭事件
-    addDialogClosed() {
+    addDialogClosed () {
       this.$refs.addFormRef.resetFields()
     },
     // 点击按钮，添加参数
-    addParams() {
+    addParams () {
       this.$refs.addFormRef.validate(async valid => {
         if (!valid) return
         const { data: res } = await this.$http.post(
@@ -324,7 +324,7 @@ export default {
       })
     },
     // 点击按钮，展示修改的对话框
-    async showEditDialog(attrId) {
+    async showEditDialog (attrId) {
       // 查询当前参数的信息
       const { data: res } = await this.$http.get(
         `categories/${this.cateId}/attributes/${attrId}`,
@@ -341,11 +341,11 @@ export default {
       this.editDialogVisible = true
     },
     // 重置修改的表单
-    editDialogClosed() {
+    editDialogClosed () {
       this.$refs.editFormRef.resetFields()
     },
     // 点击按钮，修改参数信息
-    editParams() {
+    editParams () {
       this.$refs.editFormRef.validate(async valid => {
         if (!valid) return
         const {
@@ -365,7 +365,7 @@ export default {
       })
     },
     // 根据Id删除对应的参数项
-    async removeParams(attrId) {
+    async removeParams (attrId) {
       const confirmResult = await this.$confirm(
         '此操作将永久删除该参数, 是否继续?',
         '提示',
@@ -394,7 +394,7 @@ export default {
       this.getParamsData()
     },
     // 文本框失去焦点，或摁下了 Enter 都会触发
-    async handleInputConfirm(row) {
+    async handleInputConfirm (row) {
       if (row.inputValue.trim().length === 0) {
         row.inputValue = ''
         row.inputVisible = false
@@ -408,7 +408,7 @@ export default {
       this.saveAttrVals(row)
     },
     // 将对 attr_vals 的操作，保存到数据库
-    async saveAttrVals(row) {
+    async saveAttrVals (row) {
       // 需要发起请求，保存这次操作
       const { data: res } = await this.$http.put(
         `categories/${this.cateId}/attributes/${row.attr_id}`,
@@ -426,7 +426,7 @@ export default {
       this.$message.success('修改参数项成功！')
     },
     // 点击按钮，展示文本输入框
-    showInput(row) {
+    showInput (row) {
       row.inputVisible = true
       // 让文本框自动获得焦点
       // $nextTick 方法的作用，就是当页面上元素被重新渲染之后，才会指定回调函数中的代码
@@ -435,28 +435,28 @@ export default {
       })
     },
     // 删除对应的参数可选项
-    handleClose(i, row) {
+    handleClose (i, row) {
       row.attr_vals.splice(i, 1)
       this.saveAttrVals(row)
     }
   },
   computed: {
     // 如果按钮需要被禁用，则返回true，否则返回false
-    isBtnDisabled() {
+    isBtnDisabled () {
       if (this.selectedCateKeys.length !== 3) {
         return true
       }
       return false
     },
     // 当前选中的三级分类的Id
-    cateId() {
+    cateId () {
       if (this.selectedCateKeys.length === 3) {
         return this.selectedCateKeys[2]
       }
       return null
     },
     // 动态计算标题的文本
-    titleText() {
+    titleText () {
       if (this.activeName === 'many') {
         return '动态参数'
       }

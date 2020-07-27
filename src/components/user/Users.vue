@@ -185,7 +185,7 @@
 
 <script>
 export default {
-  data() {
+  data () {
     // 验证邮箱的规则
     var checkEmail = (rule, value, cb) => {
       // 验证邮箱的正则表达式
@@ -282,11 +282,11 @@ export default {
       selectedRoleId: ''
     }
   },
-  created() {
+  created () {
     this.getuserList()
   },
   methods: {
-    async getuserList() {
+    async getuserList () {
       const { data: res } = await this.$http.get('account', {
         params: this.queryInfo
       })
@@ -298,19 +298,19 @@ export default {
       console.log(res)
     },
     // 监听 size 改变的事件
-    handleSizeChange(newSize) {
+    handleSizeChange (newSize) {
       // console.log(newSize)
       this.queryInfo.size = newSize
       this.getuserList()
     },
     // 监听 页码值 改变的事件
-    handleCurrentChange(newPage) {
+    handleCurrentChange (newPage) {
       console.log(newPage)
       this.queryInfo.current = newPage
       this.getuserList()
     },
     // 监听 switch 开关状态的改变
-    async userStateChanged(userinfo) {
+    async userStateChanged (userinfo) {
       console.log(userinfo)
       const { data: res } = await this.$http.put(
         `account/${userinfo.id}/available/${userinfo.available}`
@@ -322,11 +322,11 @@ export default {
       this.$message.success('更新用户状态成功！')
     },
     // 监听添加用户对话框的关闭事件
-    addDialogClosed() {
+    addDialogClosed () {
       this.$refs.addFormRef.resetFields()
     },
     // 点击按钮，添加新用户
-    addUser() {
+    addUser () {
       this.$refs.addFormRef.validate(async valid => {
         if (!valid) return
         // 可以发起添加用户的网络请求
@@ -344,7 +344,7 @@ export default {
       })
     },
     // 展示编辑用户的对话框
-    async showEditDialog(id) {
+    async showEditDialog (id) {
       // console.log(id)
       const { data: res } = await this.$http.get('account/' + id)
 
@@ -356,11 +356,11 @@ export default {
       this.editDialogVisible = true
     },
     // 监听修改用户对话框的关闭事件
-    editDialogClosed() {
+    editDialogClosed () {
       this.$refs.editFormRef.resetFields()
     },
     // 修改用户信息并提交
-    editUserInfo() {
+    editUserInfo () {
       this.$refs.editFormRef.validate(async valid => {
         if (!valid) return
         // 发起修改用户信息的数据请求
@@ -386,7 +386,7 @@ export default {
       })
     },
     // 根据Id删除对应的用户信息
-    async removeUserById(id) {
+    async removeUserById (id) {
       // 弹框询问用户是否删除数据
       const confirmResult = await this.$confirm(
         '此操作将永久删除该用户, 是否继续?',
@@ -415,7 +415,7 @@ export default {
       this.getuserList()
     },
     // 展示分配角色的对话框
-    async setRole(userInfo) {
+    async setRole (userInfo) {
       this.userInfo = userInfo
 
       // 在展示对话框之前，获取所有角色的列表
@@ -429,7 +429,7 @@ export default {
       this.setRoleDialogVisible = true
     },
     // 点击按钮，分配角色
-    async saveRoleInfo() {
+    async saveRoleInfo () {
       if (!this.selectedRoleId) {
         return this.$message.error('请选择要分配的角色！')
       }
@@ -447,7 +447,7 @@ export default {
       this.setRoleDialogVisible = false
     },
     // 监听分配角色对话框的关闭事件
-    setRoleDialogClosed() {
+    setRoleDialogClosed () {
       this.selectedRoleId = ''
       this.userInfo = {}
     }

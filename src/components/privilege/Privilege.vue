@@ -35,19 +35,19 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       // 权限列表
       rightsList: []
     }
   },
-  created() {
+  created () {
     // 获取所有的权限
     this.getRightsList()
   },
   methods: {
     // 获取权限列表
-    async getRightsList() {
+    async getRightsList () {
       const { data: res } = await this.$http.get('privilege/list')
       if (res.meta.status !== 200) {
         return this.$message.error('获取权限列表失败！')

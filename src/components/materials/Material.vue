@@ -4,7 +4,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>物料管理</el-breadcrumb-item>
-      <el-breadcrumb-item>物料列表</el-breadcrumb-item>
+      <el-breadcrumb-item>物料信息</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- 卡片视图区域 -->
@@ -16,8 +16,7 @@
                        :options="parentCategoryList"
                        :props="cascaderProps"
                        v-model="selectedKeys"
-                       @change="parentCategoryChanged">
-          </el-cascader>
+                       @change="parentCategoryChanged" />
         </el-col>
         <el-col :span="6">
           <el-input placeholder="请输入关键字"
@@ -26,7 +25,7 @@
                     @clear="listMaterials">
             <el-button slot="append"
                        icon="el-icon-search"
-                       @click="listMaterials"></el-button>
+                       @click="listMaterials" />
           </el-input>
         </el-col>
         <el-col :span="4">
@@ -46,26 +45,25 @@
                 border
                 stripe
                 height="484">
-        <el-table-column type="index"></el-table-column>
+        <el-table-column type="index" />
         <el-table-column label="物料名称"
-                         prop="name"></el-table-column>
+                         prop="name" />
         <el-table-column label="专业线"
                          prop="specialLine"
-                         width="80px"></el-table-column>
+                         width="80px" />
         <el-table-column label="仓库"
                          prop="repositoryName"
-                         width="80px"></el-table-column>
+                         width="80px" />
         <el-table-column label="物料数量"
                          prop="count"
-                         width="80px"></el-table-column>
+                         width="80px" />
         <el-table-column label="损坏状态"
                          prop="status"
-                         width="80px"></el-table-column>
+                         width="80px" />
         <el-table-column label="更新时间"
                          prop="updateTime"
                          sortable
-                         width="160px">
-        </el-table-column>
+                         width="160px" />
         <el-table-column label="操作"
                          width="200px">
           <template slot-scope="scope">
@@ -73,16 +71,16 @@
             <el-button type="primary"
                        icon="el-icon-edit"
                        size="mini"
-                       @click="showEditDialog(scope.row.id)"></el-button>
+                       @click="showEditDialog(scope.row.id)" />
             <el-button type="danger"
                        icon="el-icon-delete"
                        size="mini"
-                       @click="removeById(scope.row.id)"></el-button>
+                       @click="removeById(scope.row.id)" />
 
             <el-button type="success"
                        icon="el-icon-view"
                        size="mini"
-                       @click="showRecordDialog(scope.row.id)"></el-button>
+                       @click="showRecordDialog(scope.row.id)" />
 
           </template>
         </el-table-column>
@@ -96,8 +94,7 @@
                      :page-size="queryInfo.size"
                      layout="total, sizes, prev, pager, next, jumper"
                      :total="total"
-                     background>
-      </el-pagination>
+                     background />
 
       <!-- 修改分类的对话框 -->
       <el-dialog title="修改物料"
@@ -108,27 +105,27 @@
                  ref="editFormRef"
                  label-width="70px">
           <el-form-item label="名称">
-            <el-input v-model="editForm.name"></el-input>
+            <el-input v-model="editForm.name" />
           </el-form-item>
           <el-form-item label="专业线"
                         prop="specialLine">
             <el-input v-model="editForm.specialLine"
-                      disabled></el-input>
+                      disabled />
           </el-form-item>
           <el-form-item label="分类"
                         prop="categoryName">
             <el-input v-model="editForm.categoryName"
-                      disabled></el-input>
+                      disabled />
           </el-form-item>
           <el-form-item label="仓库"
                         prop="repositoryName">
             <el-input v-model="editForm.repositoryName"
-                      disabled></el-input>
+                      disabled />
           </el-form-item>
           <el-form-item label="数量"
                         prop="count">
             <el-input v-model="editForm.count"
-                      disabled></el-input>
+                      disabled />
           </el-form-item>
         </el-form>
         <span slot="footer"
@@ -156,8 +153,7 @@
                          :options="parentCategoryList_add"
                          :props="cascaderProps_add"
                          v-model="selectedKeys_add"
-                         @change="parentCategoryChanged_add">
-            </el-cascader>
+                         @change="parentCategoryChanged_add" />
           </el-form-item>
           <el-form-item label="仓库位置："
                         prop="repositoryId">
@@ -166,12 +162,12 @@
               <el-option v-for="item in repositoryList"
                          :key='item.key'
                          :label='item.value'
-                         :value="item.key"></el-option>
+                         :value="item.key" />
             </el-select>
           </el-form-item>
           <el-form-item label="物料名称：">
             <el-input prop="name"
-                      v-model="addMaterialForm.name"></el-input>
+                      v-model="addMaterialForm.name" />
           </el-form-item>
         </el-form>
         <span slot="footer"
@@ -217,7 +213,7 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       // 查询参数对象
       queryInfo: {
@@ -264,33 +260,33 @@ export default {
       editForm: {}
     }
   },
-  created() {
+  created () {
     // 先获取父级分类的数据列表
     this.getParentcateList()
   },
   methods: {
     // 点击按钮，展示添加物料的对话框
-    showAddMaterialDialog() {
+    showAddMaterialDialog () {
       this.addMaterialDialogVisible = true
       this.parentCategoryList_add = this.parentCategoryList
       this.listRepositories()
     },
     // 监听添加物料对话框的关闭事件
-    addMaterialDialogClosed() {
+    addMaterialDialogClosed () {
       this.$refs.addMaterialFormRef.resetFields()
     },
 
-    handleSizeChange(newSize) {
+    handleSizeChange (newSize) {
       this.queryInfo.size = newSize
       this.listMaterials()
     },
-    handleCurrentChange(newPage) {
+    handleCurrentChange (newPage) {
       this.queryInfo.page = newPage
       this.listMaterials()
     },
 
     // 选择项发生变化触发这个函数
-    parentCategoryChanged() {
+    parentCategoryChanged () {
       if (this.selectedKeys !== undefined) {
         if (this.selectedKeys.length > 0) {
           this.queryInfo.categoryId = this.selectedKeys[
@@ -299,7 +295,7 @@ export default {
         }
       }
     },
-    parentCategoryChanged_add() {
+    parentCategoryChanged_add () {
       if (this.selectedKeys_add !== undefined) {
         this.addMaterialForm.categoryId = this.selectedKeys_add[
           this.selectedKeys_add.length - 1
@@ -310,7 +306,7 @@ export default {
     // 后端数据接口👇
 
     // 获取仓库列表
-    async listRepositories() {
+    async listRepositories () {
       const { data: res } = await this.$http.get('repository/names')
 
       if (res.meta.status !== 200) {
@@ -321,7 +317,7 @@ export default {
     },
 
     // 删除指定物料
-    async removeById(id) {
+    async removeById (id) {
       const confirmResult = await this.$confirm(
         '此操作将永久删除该商品, 是否继续?',
         '提示',
@@ -345,7 +341,7 @@ export default {
       this.listMaterials()
     },
     // 展示编辑用户的弹框
-    async showEditDialog(id) {
+    async showEditDialog (id) {
       // console.log(id)
       const { data: res } = await this.$http.get('material/' + id)
 
@@ -356,7 +352,7 @@ export default {
       this.editForm = res.data
       this.editDialogVisible = true
     }, // 展示日志信息的弹框
-    async showRecordDialog(id) {
+    async showRecordDialog (id) {
       // console.log(id)
       // const { data: res } = await this.$http.get('material/' + id)
 
@@ -368,7 +364,7 @@ export default {
       this.recordDialogVisible = true
     },
     // 点击按钮，添加新的物料
-    addMaterial() {
+    addMaterial () {
       this.$refs.addMaterialFormRef.validate(async valid => {
         if (!valid) return
         const { data: res } = await this.$http.post(
@@ -386,7 +382,7 @@ export default {
     },
 
     // 请求获取分类菜单
-    async getParentcateList() {
+    async getParentcateList () {
       const { data: res } = await this.$http.get('category/menus', {})
 
       if (res.meta.status !== 200) {
@@ -398,7 +394,7 @@ export default {
     },
 
     // 根据分页信息请求对应的物料列表
-    async listMaterials() {
+    async listMaterials () {
       const { data: res } = await this.$http.get('material', {
         params: {
           current: this.queryInfo.page,
@@ -418,7 +414,7 @@ export default {
     },
 
     // 修改物料信息并提交
-    editCategoryInfo() {
+    editCategoryInfo () {
       this.$refs.editFormRef.validate(async valid => {
         if (!valid) return
         // 发起修改用户信息的数据请求

@@ -24,19 +24,19 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       // 权限列表
       roleList: []
     }
   },
-  created() {
+  created () {
     // 获取所有的角色
     this.listRoles()
   },
   methods: {
     // 获取角色列表
-    async listRoles() {
+    async listRoles () {
       const { data: res } = await this.$http.get('role/list')
       if (res.meta.status !== 200) {
         return this.$message.error('获取权限列表失败！')

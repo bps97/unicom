@@ -80,7 +80,7 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       // 左侧菜单数据
       menulist: [],
@@ -99,27 +99,27 @@ export default {
       activePath: ''
     }
   },
-  created() {
+  created () {
     this.listMenus()
   },
   methods: {
-    logout() {
+    logout () {
       window.sessionStorage.clear()
       this.$router.push('/login')
     },
     // 获取所有的菜单
-    async listMenus() {
+    async listMenus () {
       const { data: res } = await this.$http.get('/menu/menus')
       if (res.meta.status !== 200) return this.$message.error(res.message)
       this.menulist = res.data
       console.log(res)
     },
     // 点击按钮，切换菜单的折叠与展开
-    toggleCollapse() {
+    toggleCollapse () {
       this.isCollapse = !this.isCollapse
     },
     // 保存链接的激活状态
-    saveNavState(activePath) {
+    saveNavState (activePath) {
       window.sessionStorage.setItem('activePath', activePath)
       this.activePath = activePath
     }

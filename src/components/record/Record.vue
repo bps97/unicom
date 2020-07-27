@@ -103,20 +103,23 @@
               <el-table-column prop="materialName"
                                label="物料名称">
               </el-table-column>
-              <el-table-column prop="status" width="50px" align="center"
+              <el-table-column prop="status"
+                               width="50px"
+                               align="center"
                                label="物料状态">
               </el-table-column>
-              <el-table-column prop="specialLine" width="50px" align="center"
-                               label="专业线"
-                               >
+              <el-table-column prop="specialLine"
+                               width="50px"
+                               align="center"
+                               label="专业线">
               </el-table-column>
               <el-table-column prop="repositoryName"
                                label="所在仓库"
                                width="100">
               </el-table-column>
               <el-table-column prop="categoryName"
-                               label="所属分类" align="center"
-                               >
+                               label="所属分类"
+                               align="center">
               </el-table-column>
               <el-table-column prop="count"
                                label="数量"
@@ -165,7 +168,7 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       restaurants: [],
       recordForm: {
@@ -181,6 +184,9 @@ export default {
       queryInfo: {
         categoryId: '',
         repositoryId: ''
+      },
+      appFormItemForm: {
+        type: '记录所领用'
       },
       repoList: [],
       parentcateList: [],
@@ -206,12 +212,12 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     this.getParentcateList()
     this.listRepositories()
   },
   methods: {
-    querySearch(queryString, cb) {
+    querySearch (queryString, cb) {
       var restaurants = this.restaurants
       var results = queryString
         ? restaurants.filter(this.createFilter(queryString))
@@ -220,7 +226,7 @@ export default {
       cb(results)
       console.log(this.recordForm)
     },
-    createFilter(queryString) {
+    createFilter (queryString) {
       return restaurant => {
         return (
           restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
@@ -228,22 +234,22 @@ export default {
         )
       }
     },
-    handleSelect(item) {
+    handleSelect (item) {
       this.recordForm.materialId = item.key
     },
     // 选择项发生变化触发这个函数
-    parentCateChanged() {
+    parentCateChanged () {
       // console.log(this.selectedKeys)
       this.materialName = ''
       if (this.selectedKeys !== undefined && this.selectedKeys.length > 1) {
         this.queryInfo.categoryId = this.selectedKeys[
           this.selectedKeys.length - 1
         ]
-        this.listMaterials()
+        this.listAppFormItems()
       }
     },
     // 获取父级分类
-    async getParentcateList() {
+    async getParentcateList () {
       const { data: res } = await this.$http.get('category/menus', {})
 
       if (res.meta.status !== 200) {
@@ -251,7 +257,7 @@ export default {
       }
       this.parentcateList = res.data
     },
-    onSubmit() {
+    onSubmit () {
       // 验证表单
       this.$refs.recordForm.validate(async valid => {
         if (!valid) {
@@ -261,12 +267,12 @@ export default {
         this.submitApplyFormItem()
       })
     },
-    resetForm(formName) {
+    resetForm (formName) {
       this.$refs[formName].resetFields()
       this.selectedKeys = []
     },
     // 提交申请单项
-    async submitApplyFormItem() {
+    async submitApplyFormItem () {
       this.recordForm.categoryId = this.queryInfo.categoryId
       const { data: res } = await this.$http.post('applyItem', this.recordForm)
       if (res.meta.status !== 201) {
@@ -277,13 +283,13 @@ export default {
       this.$message.success('提交申请成功！')
     },
     // 清空表单
-    clearForm() {
+    clearForm () {
       this.resetForm('recordForm')
       // this.form.count = 1
       // this.selectedKeys = []
     },
     // 提交申请单
-    async submitApplyForm() {
+    async submitApplyForm () {
       const { data: res } = await this.$http.post('apply/message', {
         message: this.recordForm.message,
         type: this.recordForm.type
@@ -294,8 +300,8 @@ export default {
       this.$message.success('申请成功!')
       this.activeIndex = '0'
     },
-    // 获取物料列表
-    async listMaterials() {
+    // 获取申请单项列表
+    async listAppFormItems () {
       this.queryInfo.repositoryId = this.recordForm.repositoryId
       const { data: res } = await this.$http.get('material/names', {
         params: this.queryInfo
@@ -308,7 +314,7 @@ export default {
       this.restaurants = res.data
     },
     // 获取仓库列表
-    async listRepositories() {
+    async listRepositories () {
       const { data: res } = await this.$http.get('repository/names')
 
       if (res.meta.status !== 200) {
@@ -318,8 +324,10 @@ export default {
       this.repoList = res.data
     },
     // 获取申请单项
-    async listItems() {
-      const { data: res } = await this.$http.get('applyItem')
+    async listItems () {
+      const { data: res } = await this.$http.get('applyItem', {
+        params: this.appFormItemForm
+      })
 
       if (res.meta.status !== 200) {
         return this.$message.error('获取申请单列表失败！')
@@ -327,7 +335,7 @@ export default {
       this.applicationItems = res.data
       return this.applicationItems
     },
-    async removeItem(id) {
+    async removeItem (id) {
       const { data: res } = await this.$http.delete('applyItem/' + id)
 
       if (res.meta.status !== 200) {
@@ -335,21 +343,21 @@ export default {
       }
     },
     // 下一步
-    nextStep() {
+    nextStep () {
       this.activeIndex = '1'
       this.listItems()
     },
-    preStep() {
+    preStep () {
       this.activeIndex = '0'
     },
     // 立即提交申请
-    myAlert() {
+    myAlert () {
       this.$confirm('此操作将直接提交申请, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
-        .then(() => {})
+        .then(() => { })
         .catch(() => {
           this.$message({
             type: 'info',
@@ -358,7 +366,7 @@ export default {
         })
     },
     // 检测页签变化
-    beforeTabLeave(activeName, oldActiveName) {
+    beforeTabLeave (activeName, oldActiveName) {
       if (activeName === '1') {
         var res = this.listItems()
         if (res.length === 0) {
@@ -371,12 +379,12 @@ export default {
       }
       return true
     },
-    deleteRow(index, rows) {
+    deleteRow (index, rows) {
       this.removeItem(rows[index].id)
       rows.splice(index, 1)
     }
   },
-  mounted() {
+  mounted () {
     // this.restaurants = this.loadAll()
   }
 }

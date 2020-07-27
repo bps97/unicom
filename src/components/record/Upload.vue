@@ -64,20 +64,27 @@
                           style="width: 100%"
                           :cell-class-name="tableRowClassName">
                   <el-table-column prop="materialName"
-                                   label="物料全称"
-                                   :width='400'>
+                                   label="物料全称">
                   </el-table-column>
-                  <el-table-column prop="repositoryName"
-                                   label="仓库位置">
-                  </el-table-column>
-                  <el-table-column prop="categoryName" align="center"
-                                   label="物料分类">
-                  </el-table-column>
-                  <el-table-column prop="status" align="center" width="50px"
+                  <el-table-column prop="status"
+                                   align="center"
+                                   width="50px"
                                    label="物料状态">
                   </el-table-column>
-                  <el-table-column prop="count" align="center"
+                  <el-table-column prop="count"
+                                   align="center"
+                                   width="100px"
                                    label="物料数量">
+                  </el-table-column>
+                  <el-table-column prop="repositoryName"
+                                   align="center"
+                                   width="100px"
+                                   label="仓库位置">
+                  </el-table-column>
+                  <el-table-column prop="categoryName"
+                                   align="center"
+                                   width="100px"
+                                   label="物料分类">
                   </el-table-column>
                   <el-table-column fixed="right"
                                    label="操作"
@@ -135,7 +142,7 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       filesList: [],
       loading: false,
@@ -157,66 +164,71 @@ export default {
   },
 
   // 钩子函数,页面加载执行
-  created: function () {},
+  created: function () { },
   // 钩子函数,页面加载完成后执行
-  mounted() {},
+  mounted () { },
   // 函数方法
   methods: {
-    tableRowClassName({ row, column, rowIndex, columnIndex }) {
+    tableRowClassName ({ row, column, rowIndex, columnIndex }) {
       if (column.label === '物料状态') {
         if (row.status === '正常') { return 'success-row' } else { return 'danger-row' }
       }
       return ''
     },
     // 监听 size 改变
-    handleSizeChange(newSize) {
+    handleSizeChange (newSize) {
       this.queryInfo.size = newSize
-      this.listMaterials()
+      this.listApplyItems()
     },
     // 监听 page 改变
-    handleCurrentChange(newPage) {
+    handleCurrentChange (newPage) {
       this.queryInfo.page = newPage
-      this.listMaterials()
+      this.listApplyItems()
     },
     // 上传文件之前判断文件类型
-    beforeUpload(file) {
-      let isText = file.type === 'application/vnd.ms-excel'
-      let isTextComputer =
+    beforeUpload (file) {
+      const isText = file.type === 'application/vnd.ms-excel'
+      const isTextComputer =
         file.type ===
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
       return isText | isTextComputer
     },
 
     // 上传文件个数超过定义的数量
-    handleExceed(files, fileList) {
+    handleExceed (files, fileList) {
       this.$message.warning('当前限制选择 1 个文件，请删除后继续上传')
     },
 
-    uploadSuccess(file) {
-      let formData = new FormData()
+    uploadSuccess (file) {
+      const formData = new FormData()
+
       formData.append('file', file.file)
       this.filesList = formData
 
       this.fileName = file.file.name
     },
-    async listMaterials() {
+    async listApplyItems () {
       const { data: res } = await this.$http.get('/applyItem/list', {
         params: {
           current: this.queryInfo.page,
-          size: this.queryInfo.size
+          size: this.queryInfo.size,
+          type: this.contents.type
         }
       })
+
       if (res.meta.status !== 200) {
         return this.$message.error('获取物料列表失败！')
       }
       this.materialList = res.data.records
       this.total = res.data.total
     },
-    async onSubmit() {
+    async onSubmit () {
       const { data: res } = await this.$http.post('apply/message', {
         message: this.excelForm.message,
         type: this.excelForm.type
       })
+
       if (res.meta.status !== 200) {
         return this.$message.error(res.meta.message)
       }
@@ -227,7 +239,7 @@ export default {
       return this.$message.success('同步完成！')
     },
     // 提交申请单
-    uploadFile() {
+    uploadFile () {
       this.loading = true
       this.$http({
         method: 'post',
@@ -236,7 +248,7 @@ export default {
         data: this.filesList,
         params: this.contents
       })
-        .then((res) => {
+        .then(res => {
           console.log(res)
           // let data = JSON.parse(aesDecrypt(res.data.content))
           if (res.data.meta.status === 200) {
@@ -253,29 +265,29 @@ export default {
           this.filesList = []
           this.activeIndex = '1'
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err)
           this.$message.error(err)
           // this.$message.error('导入失败！')
           this.loading = false
         })
     },
-    async removeItem(id) {
+    async removeItem (id) {
       const { data: res } = await this.$http.delete('applyItem/' + id)
 
       if (res.meta.status !== 200) {
         return this.$message.error('删除失败！')
       }
     },
-    deleteRow(index, rows) {
+    deleteRow (index, rows) {
       this.removeItem(rows[index].id)
       rows.splice(index, 1)
     },
     // 检测页签变化
-    beforeTabLeave(activeName, oldActiveName) {
+    beforeTabLeave (activeName, oldActiveName) {
       if (activeName === '1') {
         if (this.materialList.length === 0) {
-          this.listMaterials()
+          this.listApplyItems()
         }
       }
       return true

@@ -4,7 +4,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>物料管理</el-breadcrumb-item>
-      <el-breadcrumb-item>物料分类</el-breadcrumb-item>
+      <el-breadcrumb-item>分类管理</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- 卡片视图区域 -->
@@ -28,8 +28,7 @@
         <el-tab-pane v-for='item in specialLineList'
                      :key='item.key'
                      :label='item.value'
-                     :name='item.key'>
-        </el-tab-pane>
+                     :name='item.key' />
         <!-- 表格 -->
 
         <el-table :data="categoryList"
@@ -41,8 +40,7 @@
                   :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
           <el-table-column prop="name"
                            label="分类名称"
-                           sortable>
-          </el-table-column>
+                           sortable />
           <el-table-column label="类别等级">
             <!-- 排序 -->
             <template slot-scope="scope">
@@ -60,8 +58,7 @@
             <!-- 是否有效 -->
             <template slot-scope="scope">
               <el-switch v-model="scope.row.available"
-                         @change="closeAvailable(scope.row)">
-              </el-switch>
+                         @change="closeAvailable(scope.row)" />
             </template>
           </el-table-column>
           <el-table-column label="操作">
@@ -86,8 +83,7 @@
                        :page-sizes="[5, 8, 10, 15]"
                        :page-size="queryInfo.size"
                        layout="total, sizes, prev, pager, next, jumper"
-                       :total="total">
-        </el-pagination>
+                       :total="total" />
       </el-tabs>
     </el-card>
 
@@ -100,17 +96,17 @@
                ref="editFormRef"
                label-width="70px">
         <el-form-item label="名称">
-          <el-input v-model="editForm.name"></el-input>
+          <el-input v-model="editForm.name" />
         </el-form-item>
         <el-form-item label="专业线"
                       prop="specialLine">
           <el-input v-model="editForm.specialLine"
-                    disabled></el-input>
+                    disabled />
         </el-form-item>
         <el-form-item label="等级"
                       prop="level">
           <el-input v-model="editForm.level"
-                    disabled></el-input>
+                    disabled />
         </el-form-item>
       </el-form>
       <span slot="footer"
@@ -139,12 +135,11 @@
                        :props="cascaderProps"
                        v-model="selectedKeys"
                        @change="parentCategoryChanged"
-                       clearable>
-          </el-cascader>
+                       clearable />
         </el-form-item>
         <el-form-item label="分类名称："
                       prop="name">
-          <el-input v-model="addCategorygoryFrom.name"></el-input>
+          <el-input v-model="addCategorygoryFrom.name" />
         </el-form-item>
       </el-form>
       <span slot="footer"
@@ -159,7 +154,7 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       // 查询条件
       queryInfo: {
@@ -202,23 +197,23 @@ export default {
       specialLineList: {}
     }
   },
-  created() {
+  created () {
     this.listSpecialLine()
     this.listCategories()
   },
   methods: {
     // 监听 size 改变
-    handleSizeChange(newSize) {
+    handleSizeChange (newSize) {
       this.queryInfo.size = newSize
       this.listCategories()
     },
     // 监听 page 改变
-    handleCurrentChange(newPage) {
+    handleCurrentChange (newPage) {
       this.queryInfo.page = newPage
       this.listCategories()
     },
     // 点击按钮，展示添加分类的对话框
-    showAddCategoryDialog() {
+    showAddCategoryDialog () {
       // 先获取父级分类的数据列表
       this.listParentCategories()
       // 再展示出对话框
@@ -226,7 +221,7 @@ export default {
     },
 
     // 选择项发生变化触发这个函数
-    parentCategoryChanged() {
+    parentCategoryChanged () {
       console.log(this.selectedKeys)
       // 如果 selectedKeys 数组中的 length 大于0，证明选中的父级分类
       // 反之，就说明没有选中任何父级分类
@@ -242,20 +237,20 @@ export default {
     },
 
     // 监听对话框的关闭事件，重置表单数据
-    addCategorygoryDialogClosed() {
+    addCategorygoryDialogClosed () {
       this.$refs.addCategorygoryFromRef.resetFields()
       this.selectedKeys = []
       this.addCategorygoryFrom.parentId = 0
     },
     // 切换标签
-    shiftTabs() {
+    shiftTabs () {
       this.queryInfo.specialLineId = this.activeName
       this.listCategories()
     },
 
     // 后端交互相关
 
-    async listSpecialLine() {
+    async listSpecialLine () {
       const { data: res } = await this.$http.get('category/specialLine')
       if (res.meta.status !== 200) {
         return this.$message.error('获取专业线标签失败！')
@@ -264,7 +259,7 @@ export default {
     },
 
     // 监听 switch 开关状态的改变
-    async closeAvailable(user) {
+    async closeAvailable (user) {
       const { data: res } = await this.$http.put(
         `category/${user.id}/available/${user.available}`
       )
@@ -276,7 +271,7 @@ export default {
     },
 
     // 获取商品分类数据
-    async listCategories() {
+    async listCategories () {
       const { data: res } = await this.$http.get('category/list', {
         params: {
           current: this.queryInfo.page,
@@ -299,7 +294,7 @@ export default {
       }
     },
     // 获取父级分类的数据列表
-    async listParentCategories() {
+    async listParentCategories () {
       const { data: res } = await this.$http.get('category/menus', {})
 
       if (res.meta.status !== 200) {
@@ -311,7 +306,7 @@ export default {
     },
 
     // 点击按钮，添加新的分类
-    addCategory() {
+    addCategory () {
       this.$refs.addCategorygoryFromRef.validate(async valid => {
         if (!valid) return
         const { data: res } = await this.$http.post(
@@ -329,7 +324,7 @@ export default {
       })
     },
     // 展示编辑分类的对话框
-    async showEditDialog(id) {
+    async showEditDialog (id) {
       // console.log(id)
       const { data: res } = await this.$http.get('category/' + id)
 
@@ -341,11 +336,11 @@ export default {
       this.editDialogVisible = true
     },
     // 监听修改用户对话框的关闭事件
-    editDialogClosed() {
+    editDialogClosed () {
       this.$refs.editFormRef.resetFields()
     },
     // 根据Id删除对应的用户信息
-    async removeById(id) {
+    async removeById (id) {
       // 弹框询问用户是否删除数据
       const confirmResult = await this.$confirm(
         '此操作将永久删除该分类信息, 是否继续?',
@@ -375,7 +370,7 @@ export default {
     },
 
     // 修改分类信息并提交
-    editCategoryInfo() {
+    editCategoryInfo () {
       this.$refs.editFormRef.validate(async valid => {
         if (!valid) return
         // 发起修改用户信息的数据请求

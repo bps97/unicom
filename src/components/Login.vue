@@ -41,7 +41,7 @@
 <!-- 行为区 -->
 <script>
 export default {
-  data() {
+  data () {
     return {
       // 这是登录表单的数据绑定对象
       loginForm: {
@@ -73,10 +73,10 @@ export default {
     }
   },
   methods: {
-    resetLoginForm() {
+    resetLoginForm () {
       this.$refs.loginFormRef.resetFields()
     },
-    login() {
+    login () {
       this.$refs.loginFormRef.validate(async valid => {
         // async同步数据表单的数据，如默认值也能同步
         if (!valid) return
