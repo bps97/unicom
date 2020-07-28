@@ -6,8 +6,8 @@ import './plugins/element.js'
 import './assets/fonts/iconfont.css'
 // 导入全局样式表
 import './assets/css/global.css'
-
 import axios from 'axios'
+
 // 配置请求的根路径
 axios.defaults.baseURL = 'http://localhost:8101'
 // axios.defaults.baseURL = 'http://10.22.34.160:8101'
@@ -17,7 +17,6 @@ axios.interceptors.request.use(config => {
   return config
 })
 Vue.prototype.$http = axios
-
 Vue.config.productionTip = false
 
 new Vue({

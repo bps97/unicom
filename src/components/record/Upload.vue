@@ -9,6 +9,16 @@
 
     <!-- 卡片视图区域 -->
     <el-card>
+      <!-- 提示区域 -->
+      <el-alert title=""
+                type="info"
+                center
+                :closable="false">
+        <el-button type="text"
+                   icon="el-icon-download"
+                   circle
+                   @click="downloadTemplate">点击下载模板</el-button>
+      </el-alert>
       <!-- 步骤条区域 -->
       <el-steps :active="activeIndex - 0"
                 finish-status="success"
@@ -169,6 +179,7 @@ export default {
   mounted () { },
   // 函数方法
   methods: {
+
     tableRowClassName ({ row, column, rowIndex, columnIndex }) {
       if (column.label === '物料状态') {
         if (row.status === '正常') { return 'success-row' } else { return 'danger-row' }
@@ -222,6 +233,35 @@ export default {
       }
       this.materialList = res.data.records
       this.total = res.data.total
+    },
+    async downloadTemplate () {
+      this.$http.get('/download/物料批量导入模版(使用时删除示例).xlsx', {
+        responseType: 'blob'
+      }).then((res) => {
+        // let prefix = this.mime.getExtension(res.data.type) // 根据类型获取文件后缀
+        let prefix = '.xlsx'
+        let data = new Blob([res.data])
+        let downloadUrl = window.URL.createObjectURL(data)
+        let anchor = document.createElement('a')
+        anchor.href = downloadUrl
+        anchor.download = +new Date() + '.' + prefix
+        anchor.click()
+        window.URL.revokeObjectURL(data)
+
+        // // 回传给后端
+        // let files = new window.File([new Blob([res.data])], 'my.mp4');
+        // let fd = new FormData();
+        // fd.append('file', files);
+        // fd.append('file', files);
+        // axios.post('/uploadRouter', fd).then((data) => {
+        //   console.log(data);
+        // }).catch((e) => {
+        //   console.error(e);
+        // });
+      }).catch((e) => {
+        console.error(e)
+        return false
+      })
     },
     async onSubmit () {
       const { data: res } = await this.$http.post('apply/message', {
