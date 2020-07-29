@@ -6,6 +6,8 @@ const Home = () => import(/* webpackChunkName: "Base_Page" */ '../components/Hom
 const Welcome = () => import(/* webpackChunkName: "Base_Page" */ '../components/Welcome.vue')
 
 const Users = () => import(/* webpackChunkName: "Account" */ '../components/user/Users.vue')
+const Pwd = () => import(/* webpackChunkName: "Account" */ '../components/user/Password.vue')
+
 const Privilege = () => import(/* webpackChunkName: "Account" */ '../components/privilege/Privilege.vue')
 const Role = () => import(/* webpackChunkName: "Account" */ '../components/privilege/Role.vue')
 
@@ -37,7 +39,8 @@ const router = new VueRouter({
         { path: '/records', component: Records },
         { path: '/logs', component: Log },
         { path: '/privileges', component: Privilege },
-        { path: '/roles', component: Role }
+        { path: '/roles', component: Role },
+        { path: '/passwords', component: Pwd }
       ]
     }
   ]

@@ -41,7 +41,9 @@
           <el-table-column prop="name"
                            label="分类名称"
                            sortable />
-          <el-table-column label="类别等级">
+          <el-table-column label="类别等级"
+                           width="100px"
+                           align="center">
             <!-- 排序 -->
             <template slot-scope="scope">
               <el-tag size="mini"
@@ -54,14 +56,17 @@
                       v-else>三级</el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="是否有效">
+          <el-table-column label="有效性"
+                           width="66px">
             <!-- 是否有效 -->
             <template slot-scope="scope">
               <el-switch v-model="scope.row.available"
                          @change="closeAvailable(scope.row)" />
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作"
+                           width="200px"
+                           align="center">
             <!-- 操作 -->
             <template slot-scope="scope">
               <el-button type="primary"

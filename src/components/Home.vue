@@ -17,11 +17,14 @@
           <el-menu-item index="2-1"
                         @click="logout">退出
           </el-menu-item>
+          <el-menu-item index="2-2"
+                        @click="changePwd">修改密码
+          </el-menu-item>
         </el-submenu>
-        <el-menu-item index="2">
+        <!-- <el-menu-item index="2">
           <a href="#"
              target="_blank">关于我们</a>
-        </el-menu-item>
+        </el-menu-item> -->
       </el-menu>
     </el-header>
     <!-- 页面主体区域 -->
@@ -122,6 +125,9 @@ export default {
     saveNavState (activePath) {
       window.sessionStorage.setItem('activePath', activePath)
       this.activePath = activePath
+    },
+    changePwd () {
+      this.$router.push('/passwords')
     }
   }
 }

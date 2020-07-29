@@ -45,27 +45,45 @@
                 border
                 stripe
                 height="484">
-        <el-table-column type="index" />
+        <el-table-column type="expand">
+          <template slot-scope="props">
+            <el-form label-position="left"
+                     inline
+                     class="demo-table-expand">
+              <el-form-item label="物料ID">
+                <span>{{ props.row.id }}</span>
+              </el-form-item>
+              <el-form-item label="专业线">
+                <span>{{ props.row.specialLine }}</span>
+              </el-form-item>
+
+              <el-form-item label="专业线">
+                <span>{{ props.row.categoryName }}</span>
+              </el-form-item>
+
+              <el-form-item label="所在仓库">
+                <span>{{ props.row.warehouseName }}</span>
+              </el-form-item>
+
+              <el-form-item label="更新时间">
+                <span>{{ props.row.updateTime }}</span>
+              </el-form-item>
+
+            </el-form>
+          </template>
+        </el-table-column>
+        <!-- <el-table-column type="index" /> -->
         <el-table-column label="物料名称"
                          prop="name" />
-        <el-table-column label="专业线"
-                         prop="specialLine"
-                         width="80px" />
-        <el-table-column label="仓库"
-                         prop="repositoryName"
-                         width="80px" />
-        <el-table-column label="物料数量"
-                         prop="count"
-                         width="80px" />
         <el-table-column label="损坏状态"
                          prop="status"
+                         width="50px" />
+        <el-table-column label="物料数量"
+                         align="center"
+                         prop="count"
                          width="80px" />
-        <el-table-column label="更新时间"
-                         prop="updateTime"
-                         sortable
-                         width="160px" />
         <el-table-column label="操作"
-                         width="200px">
+                         width="175px">
           <template slot-scope="scope">
 
             <el-button type="primary"
@@ -118,8 +136,8 @@
                       disabled />
           </el-form-item>
           <el-form-item label="仓库"
-                        prop="repositoryName">
-            <el-input v-model="editForm.repositoryName"
+                        prop="warehouseName">
+            <el-input v-model="editForm.warehouseName"
                       disabled />
           </el-form-item>
           <el-form-item label="数量"
@@ -156,10 +174,10 @@
                          @change="parentCategoryChanged_add" />
           </el-form-item>
           <el-form-item label="仓库位置："
-                        prop="repositoryId">
-            <el-select v-model="addMaterialForm.repositoryId"
+                        prop="warehouseId">
+            <el-select v-model="addMaterialForm.warehouseId"
                        placeholder="请选择仓库">
-              <el-option v-for="item in repositoryList"
+              <el-option v-for="item in warehouseList"
                          :key='item.key'
                          :label='item.value'
                          :value="item.key" />
@@ -223,7 +241,7 @@ export default {
         categoryId: ''
       },
       // 仓库列表
-      repositoryList: [],
+      warehouseList: [],
       // 商品列表
       materialList: undefined,
       // 总数据条数
@@ -251,7 +269,7 @@ export default {
       addMaterialDialogVisible: false,
       addMaterialForm: {
         name: '',
-        repositoryId: '',
+        warehouseId: '',
         categoryId: ''
       },
       editDialogVisible: false,
@@ -307,13 +325,13 @@ export default {
 
     // 获取仓库列表
     async listRepositories () {
-      const { data: res } = await this.$http.get('repository/names')
+      const { data: res } = await this.$http.get('warehouse/names')
 
       if (res.meta.status !== 200) {
         return this.$message.error('获取仓库列表失败！')
       }
 
-      this.repositoryList = res.data
+      this.warehouseList = res.data
     },
 
     // 删除指定物料
@@ -441,4 +459,16 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.demo-table-expand {
+  font-size: 0;
+}
+.demo-table-expand label {
+  width: 90px;
+  color: #99a9bf;
+}
+.demo-table-expand .el-form-item {
+  margin-right: 0;
+  margin-bottom: 0;
+  width: 100%;
+}
 </style>

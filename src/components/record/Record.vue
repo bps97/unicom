@@ -3,8 +3,8 @@
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>审批流程</el-breadcrumb-item>
-      <el-breadcrumb-item>领用录入</el-breadcrumb-item>
+      <el-breadcrumb-item>物料出入库</el-breadcrumb-item>
+      <el-breadcrumb-item>逐项出库</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图区域 -->
     <el-card>
@@ -34,15 +34,21 @@
                  :before-leave="beforeTabLeave">
           <el-tab-pane label="物料信息"
                        name="0">
+            <el-form-item label="物料情况"
+                          prop="status">
+              <el-radio v-model="recordForm.status"
+                        label="正常">正常</el-radio>
+              <el-radio v-model="recordForm.status"
+                        label="损坏">损坏</el-radio>
+            </el-form-item>
             <el-form-item label="仓库位置"
-                          prop="repositoryId">
-              <el-select v-model="recordForm.repositoryId"
+                          prop="warehouseId">
+              <el-select v-model="recordForm.warehouseId"
                          placeholder="请选择仓库">
                 <el-option v-for="item in repoList"
                            :key='item.key'
                            :label='item.value'
                            :value="item.key"></el-option>
-
               </el-select>
             </el-form-item>
             <el-form-item label="物料分类">
@@ -57,6 +63,7 @@
                            props.checkStrictly>
               </el-cascader>
             </el-form-item>
+
             <el-form-item label="物料名称"
                           prop="materialName">
               <el-autocomplete class="inline-input"
@@ -68,12 +75,6 @@
                                :rows="2"
                                type="textarea">
               </el-autocomplete>
-            </el-form-item>
-            <el-form-item>
-              <el-radio v-model="recordForm.status"
-                        label="正常">正常</el-radio>
-              <el-radio v-model="recordForm.status"
-                        label="损坏">损坏</el-radio>
             </el-form-item>
             <el-form-item label="物料数量">
               <el-col :span='8'>
@@ -88,7 +89,7 @@
               <el-button type="success"
                          @click="onSubmit">添加</el-button>
               <el-button type="primary"
-                         @click="nextStep">下一步</el-button>
+                         @click="nextStep">查看申请单</el-button>
               <el-button @click="resetForm('recordForm')">清空</el-button>
             </el-form-item>
 
@@ -113,7 +114,7 @@
                                align="center"
                                label="专业线">
               </el-table-column>
-              <el-table-column prop="repositoryName"
+              <el-table-column prop="warehouseName"
                                label="所在仓库"
                                width="100">
               </el-table-column>
@@ -176,18 +177,12 @@ export default {
         materialName: '',
         message: '',
         count: 1,
-        repositoryId: '',
+        warehouseId: '',
         categoryId: '',
         status: '正常',
-        type: '领用'
+        type: '逐项出库'
       },
-      queryInfo: {
-        categoryId: '',
-        repositoryId: ''
-      },
-      appFormItemForm: {
-        type: '记录所领用'
-      },
+
       repoList: [],
       parentcateList: [],
       applicationItems: [],
@@ -203,7 +198,7 @@ export default {
       activeIndex: 0,
 
       recordFormRules: {
-        repositoryId: [
+        warehouseId: [
           { required: true, message: '请选择仓库位置', trigger: 'change' }
         ],
         materialName: [
@@ -242,10 +237,10 @@ export default {
       // console.log(this.selectedKeys)
       this.materialName = ''
       if (this.selectedKeys !== undefined && this.selectedKeys.length > 1) {
-        this.queryInfo.categoryId = this.selectedKeys[
+        this.recordForm.categoryId = this.selectedKeys[
           this.selectedKeys.length - 1
         ]
-        this.listAppFormItems()
+        this.listMaterialNames()
       }
     },
     // 获取父级分类
@@ -273,7 +268,6 @@ export default {
     },
     // 提交申请单项
     async submitApplyFormItem () {
-      this.recordForm.categoryId = this.queryInfo.categoryId
       const { data: res } = await this.$http.post('applyItem', this.recordForm)
       if (res.meta.status !== 201) {
         this.$message.error('添加成功失败！')
@@ -301,10 +295,13 @@ export default {
       this.activeIndex = '0'
     },
     // 获取申请单项列表
-    async listAppFormItems () {
-      this.queryInfo.repositoryId = this.recordForm.repositoryId
+    async listMaterialNames () {
       const { data: res } = await this.$http.get('material/names', {
-        params: this.queryInfo
+        params: {
+          warehouseId: this.recordForm.warehouseId,
+          categoryId: this.recordForm.categoryId,
+          status: this.recordForm.status
+        }
       })
 
       if (res.meta.status !== 200) {
@@ -315,7 +312,7 @@ export default {
     },
     // 获取仓库列表
     async listRepositories () {
-      const { data: res } = await this.$http.get('repository/names')
+      const { data: res } = await this.$http.get('warehouse/names')
 
       if (res.meta.status !== 200) {
         return this.$message.error('获取仓库列表失败！')
@@ -326,7 +323,9 @@ export default {
     // 获取申请单项
     async listItems () {
       const { data: res } = await this.$http.get('applyItem', {
-        params: this.appFormItemForm
+        params: {
+          type: this.recordForm.type
+        }
       })
 
       if (res.meta.status !== 200) {

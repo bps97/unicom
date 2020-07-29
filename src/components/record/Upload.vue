@@ -3,8 +3,8 @@
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>审批管理</el-breadcrumb-item>
-      <el-breadcrumb-item>批量导入</el-breadcrumb-item>
+      <el-breadcrumb-item>物料出入库</el-breadcrumb-item>
+      <el-breadcrumb-item>批量入库</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- 卡片视图区域 -->
@@ -86,7 +86,7 @@
                                    width="100px"
                                    label="物料数量">
                   </el-table-column>
-                  <el-table-column prop="repositoryName"
+                  <el-table-column prop="warehouseName"
                                    align="center"
                                    width="100px"
                                    label="仓库位置">
@@ -165,10 +165,10 @@ export default {
       },
       excelForm: {
         message: '',
-        type: '批量导入'
+        type: '批量入库'
       },
       contents: {
-        type: '批量导入'
+        type: '批量入库'
       }
     }
   },
