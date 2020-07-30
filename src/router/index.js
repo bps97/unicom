@@ -17,6 +17,7 @@ const Materials = () => import(/* webpackChunkName: "Materials" */ '../component
 
 const Upload = () => import(/* webpackChunkName: "Records" */ '../components/record/Upload.vue')
 const Records = () => import(/* webpackChunkName: "Records" */ '../components/record/Record.vue')
+const Entry = () => import(/* webpackChunkName: "Records" */ '../components/record/Entry.vue')
 const Log = () => import(/* webpackChunkName: "Records" */ '../components/log/Log.vue')
 
 Vue.use(VueRouter)
@@ -37,6 +38,7 @@ const router = new VueRouter({
         { path: '/materials', component: Materials },
         { path: '/excel', component: Upload },
         { path: '/records', component: Records },
+        { path: '/entry', component: Entry },
         { path: '/logs', component: Log },
         { path: '/privileges', component: Privilege },
         { path: '/roles', component: Role },

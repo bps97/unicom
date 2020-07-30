@@ -13,7 +13,7 @@
     <el-tabs v-model="activeName"
              @tab-click="shiftTabs"
              type="border-card">
-      <el-tab-pane v-for='item in repositoryList'
+      <el-tab-pane v-for='item in warehouseList'
                    :key='item.key'
                    :label='item.value'
                    :name='item.key' />
@@ -51,23 +51,18 @@
           <el-table-column label="工单"
                            align="center">
 
-            <el-table-column label="申请理由"
-                             prop="message" />
-            <el-table-column label="申请用户"
-                             sortable
-                             width="100"
-                             prop="userName" />
             <el-table-column label="记录类型"
                              sortable
                              width="100"
                              prop="type" />
-
+            <el-table-column label="申请用户"
+                             sortable
+                             width="100"
+                             prop="userName" />
+            <el-table-column label="出入库情况"
+                             prop="message" />
           </el-table-column>
-          <el-table-column label="工单时间"
-                           sortable
-                           align="center"
-                           prop="createTime"
-                           width="100" />
+
           <el-table-column label="物料"
                            align="center">
             <el-table-column label="名称"
@@ -84,6 +79,11 @@
                            width="80" />
           <el-table-column label="分类类型"
                            prop="categoryName" />
+          <el-table-column label="工单时间"
+                           sortable
+                           align="center"
+                           prop="createTime"
+                           width="100" />
 
         </el-table>
       </el-row>
@@ -114,7 +114,7 @@ export default {
       },
       // 商品分类的数据列表，默认为空
       total: 0,
-      repositoryList: {},
+      warehouseList: {},
       recordList: undefined,
       specialLines: logTypes,
       activeName: '1270283833125527553',
@@ -160,12 +160,12 @@ export default {
       this.searchLog()
     },
     async listRepositories () {
-      const { data: res } = await this.$http.get('repository/names')
+      const { data: res } = await this.$http.get('warehouse/names')
 
       if (res.meta.status !== 200) {
         return this.$message.error('获取仓库列表失败！')
       }
-      this.repositoryList = res.data
+      this.warehouseList = res.data
     },
     async searchLog () {
       // 提交申请单
@@ -173,7 +173,7 @@ export default {
         params: {
           current: this.queryInfo.page,
           size: this.queryInfo.size,
-          repositoryId: this.activeName,
+          warehouseId: this.activeName,
           specialLines: this.logForm.checkedspecialLine.toString()
         }
       })

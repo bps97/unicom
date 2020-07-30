@@ -8,7 +8,14 @@
     </el-breadcrumb>
 
     <!-- 卡片视图区域 -->
-    <el-card>
+    <!-- tab 页签区域 -->
+    <el-tabs v-model="activeName"
+             @tab-click="shiftTabs"
+             type="border-card">
+      <el-tab-pane v-for='item in warehouseNames'
+                   :key='item.key'
+                   :label='item.value'
+                   :name='item.key' />
       <el-row :gutter="20">
         <!-- 选择商品分类区域 -->
         <el-col :span='5'>
@@ -35,7 +42,7 @@
                       content="注意此处添加物料并不会修改仓库内物料数量">
             <el-button type="primary"
                        slot="reference"
-                       @click="showAddMaterialDialog">添加分类</el-button>
+                       @click="showAddMaterialDialog">添加物料</el-button>
           </el-popover>
         </el-col>
       </el-row>
@@ -57,7 +64,7 @@
                 <span>{{ props.row.specialLine }}</span>
               </el-form-item>
 
-              <el-form-item label="专业线">
+              <el-form-item label="分类名">
                 <span>{{ props.row.categoryName }}</span>
               </el-form-item>
 
@@ -177,7 +184,7 @@
                         prop="warehouseId">
             <el-select v-model="addMaterialForm.warehouseId"
                        placeholder="请选择仓库">
-              <el-option v-for="item in warehouseList"
+              <el-option v-for="item in warehouseNames"
                          :key='item.key'
                          :label='item.value'
                          :value="item.key" />
@@ -224,8 +231,7 @@
           </el-timeline>
         </div>
       </el-dialog>
-    </el-card>
-
+    </el-tabs>
   </div>
 </template>
 
@@ -241,7 +247,8 @@ export default {
         categoryId: ''
       },
       // 仓库列表
-      warehouseList: [],
+      warehouseNames: [],
+      activeName: '1270283833125527553',
       // 商品列表
       materialList: undefined,
       // 总数据条数
@@ -281,13 +288,23 @@ export default {
   created () {
     // 先获取父级分类的数据列表
     this.getParentcateList()
+    this.listWarehouseNames()
   },
   methods: {
+    async listWarehouseNames () {
+      const { data: res } = await this.$http.get('warehouse/names')
+
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取仓库列表失败！')
+      }
+      this.warehouseNames = res.data
+    },
+
     // 点击按钮，展示添加物料的对话框
     showAddMaterialDialog () {
       this.addMaterialDialogVisible = true
       this.parentCategoryList_add = this.parentCategoryList
-      this.listRepositories()
+      this.listWarehouseNames()
     },
     // 监听添加物料对话框的关闭事件
     addMaterialDialogClosed () {
@@ -322,17 +339,6 @@ export default {
     },
 
     // 后端数据接口👇
-
-    // 获取仓库列表
-    async listRepositories () {
-      const { data: res } = await this.$http.get('warehouse/names')
-
-      if (res.meta.status !== 200) {
-        return this.$message.error('获取仓库列表失败！')
-      }
-
-      this.warehouseList = res.data
-    },
 
     // 删除指定物料
     async removeById (id) {
@@ -418,7 +424,8 @@ export default {
           current: this.queryInfo.page,
           size: this.queryInfo.size,
           categoryId: this.queryInfo.categoryId,
-          key: this.queryInfo.key
+          key: this.queryInfo.key,
+          warehouseId: this.activeName
         }
       })
       if (res.meta.status !== 200) {

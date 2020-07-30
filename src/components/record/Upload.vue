@@ -235,7 +235,7 @@ export default {
       this.total = res.data.total
     },
     async downloadTemplate () {
-      this.$http.get('/download/物料批量导入模版(使用时删除示例).xlsx', {
+      this.$http.get('/download/excel_import_template.xlsx', {
         responseType: 'blob'
       }).then((res) => {
         // let prefix = this.mime.getExtension(res.data.type) // 根据类型获取文件后缀
@@ -264,7 +264,7 @@ export default {
       })
     },
     async onSubmit () {
-      const { data: res } = await this.$http.post('apply/message', {
+      const { data: res } = await this.$http.put('apply/message', {
         message: this.excelForm.message,
         type: this.excelForm.type
       })
