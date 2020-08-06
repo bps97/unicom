@@ -4,7 +4,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>物料出入库</el-breadcrumb-item>
-      <el-breadcrumb-item>逐项出库</el-breadcrumb-item>
+      <el-breadcrumb-item>逐项入库</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图区域 -->
     <el-card>
@@ -33,7 +33,8 @@
                  :tab-position="'left'"
                  :before-leave="beforeTabLeave">
           <el-tab-pane label="物料信息"
-                       name="0">
+                       name="0"
+                       v-loading='loading'>
             <el-form-item label="物料情况"
                           prop="status">
               <el-radio v-model="materialForm.status"
@@ -42,13 +43,13 @@
                         label="损坏">损坏</el-radio>
             </el-form-item>
             <el-form-item label="仓库位置"
-                          prop="warehouseId">
-              <el-select v-model="materialForm.warehouseId"
+                          prop="warehouse">
+              <el-select v-model="materialForm.warehouse"
                          placeholder="请选择仓库">
                 <el-option v-for="item in warehouseNames"
                            :key='item.key'
                            :label='item.value'
-                           :value="item.key"></el-option>
+                           :value="item"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="物料分类">
@@ -136,7 +137,7 @@
               </el-table-column>
             </el-table>
             <br>
-            <el-form-item label="使用原因">
+            <el-form-item label="备注信息">
               <el-col :span="12">
                 <el-input type="textarea"
                           v-model="applicationForm.message"></el-input>
@@ -167,15 +168,15 @@ export default {
       materialForm: {
         materialId: '',
         materialName: '',
-        warehouseId: '',
+        warehouse: [],
         categoryId: '',
         status: '正常',
         count: 1,
-        type: '逐项出库'
+        type: '逐项入库'
       },
       applicationForm: {
         message: '',
-        type: '逐项出库'
+        type: '逐项入库'
       },
       warehouseNames: [],
       applicationItemList: [],
@@ -192,6 +193,7 @@ export default {
 
       // 默认激活索引
       activeIndex: 0,
+      loading: false,
 
       materialFormRules: {
         status: [
@@ -234,9 +236,8 @@ export default {
       // console.log(this.selectedKeys)
       this.materialName = ''
       if (this.selectedKeys !== undefined && this.selectedKeys.length > 1) {
-        this.materialForm.categoryId = this.selectedKeys[
-          this.selectedKeys.length - 1
-        ]
+        this.materialForm.categoryId = this.selectedKeys[this.selectedKeys.length - 1]
+        this.materialForm.specialLineId = this.selectedKeys[0] // 专业线
         this.listMaterialNames()
       }
     },
@@ -255,21 +256,30 @@ export default {
         if (!valid) {
           return
         }
-        console.log(this.materialForm.materialName)
+        this.loading = true
         this.checkMaterial()
-        // 提交申请单
-        console.log(this.materialForm.materialName)
-        this.alertSubmitItem()
       })
     },
     async checkMaterial () {
       const { data: res } = await this.$http.get('applyItem/material/check', {
-        params: this.materialForm
+        params: {
+          materialName: this.materialForm.materialName,
+          warehouseId: this.materialForm.warehouse.key,
+          warehouseName: this.materialForm.warehouse.value,
+          categoryId: this.materialForm.categoryId,
+          specialLineId: this.materialForm.specialLineId,
+          count: this.materialForm.count,
+          status: this.materialForm.status,
+          type: this.materialForm.type
+        }
       })
       if (res.meta.status !== 200) {
         return this.$message.error(res.meta.message)
       }
       this.materialForm.materialId = res.data.id
+      // 提交申请单
+      this.alertSubmitItem()
+      this.loading = false
     },
     resetForm (formName) {
       this.$refs[formName].resetFields()
@@ -277,19 +287,29 @@ export default {
     },
     // 提交申请单项
     async alertSubmitItem () {
-      const { data: res } = await this.$http.post('applyItem', this.materialForm)
+      const { data: res } = await this.$http.post('applyItem', {
+        materialId: this.materialForm.materialId,
+        materialName: this.materialForm.materialName,
+        warehouseId: this.materialForm.warehouse.key,
+        warehouseName: this.materialForm.warehouse.value,
+        categoryId: this.materialForm.categoryId,
+        specialLineId: this.materialForm.specialLineId,
+        count: this.materialForm.count,
+        status: this.materialForm.status,
+        type: this.materialForm.type
+      })
       if (res.meta.status !== 201) {
         return this.$message.error(res.meta.message)
       }
       this.resetForm('materialForm') // 清空表单
-      this.$message.success('提交申请成功！')
+      this.$message.success(res.meta.message)
     },
 
     // 获取物料名称
     async listMaterialNames () {
       const { data: res } = await this.$http.get('material/names', {
         params: {
-          warehouseId: this.materialForm.warehouseId,
+          warehouseId: this.materialForm.warehouse.key,
           categoryId: this.materialForm.categoryId,
           status: this.materialForm.status
         }
@@ -356,7 +376,7 @@ export default {
     },
     // 提交申请单
     async submitApplication () {
-      const { data: res } = await this.$http.post('apply/message', this.applicationForm)
+      const { data: res } = await this.$http.put('apply/message', this.applicationForm)
       if (res.meta.status !== 200) {
         return this.$message.error('提交申请失败！' + res.meta.message)
       }

@@ -16,7 +16,7 @@ const Params = () => import(/* webpackChunkName: "Materials" */ '../components/m
 const Materials = () => import(/* webpackChunkName: "Materials" */ '../components/materials/Material.vue')
 
 const Upload = () => import(/* webpackChunkName: "Records" */ '../components/record/Upload.vue')
-const Records = () => import(/* webpackChunkName: "Records" */ '../components/record/Record.vue')
+const Exist = () => import(/* webpackChunkName: "Records" */ '../components/record/Exist.vue')
 const Entry = () => import(/* webpackChunkName: "Records" */ '../components/record/Entry.vue')
 const Log = () => import(/* webpackChunkName: "Records" */ '../components/log/Log.vue')
 
@@ -37,7 +37,7 @@ const router = new VueRouter({
         { path: '/params', component: Params },
         { path: '/materials', component: Materials },
         { path: '/excel', component: Upload },
-        { path: '/records', component: Records },
+        { path: '/exist', component: Exist },
         { path: '/entry', component: Entry },
         { path: '/logs', component: Log },
         { path: '/privileges', component: Privilege },

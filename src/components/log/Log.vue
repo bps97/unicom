@@ -13,7 +13,7 @@
     <el-tabs v-model="activeName"
              @tab-click="shiftTabs"
              type="border-card">
-      <el-tab-pane v-for='item in warehouseList'
+      <el-tab-pane v-for='item in warehouseNames'
                    :key='item.key'
                    :label='item.value'
                    :name='item.key' />
@@ -114,7 +114,7 @@ export default {
       },
       // 商品分类的数据列表，默认为空
       total: 0,
-      warehouseList: {},
+      warehouseNames: {},
       recordList: undefined,
       specialLines: logTypes,
       activeName: '1270283833125527553',
@@ -124,7 +124,7 @@ export default {
     }
   },
   created () {
-    this.listRepositories()
+    this.listWarehouseNames()
     console.log(this.activeName)
   },
   methods: {
@@ -159,13 +159,13 @@ export default {
       this.queryInfo.page = newPage
       this.searchLog()
     },
-    async listRepositories () {
+    async listWarehouseNames () {
       const { data: res } = await this.$http.get('warehouse/names')
 
       if (res.meta.status !== 200) {
         return this.$message.error('获取仓库列表失败！')
       }
-      this.warehouseList = res.data
+      this.warehouseNames = res.data
     },
     async searchLog () {
       // 提交申请单

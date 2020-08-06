@@ -9,7 +9,7 @@
     <!-- 卡片视图区域 -->
     <el-card>
       <!-- 提示区域 -->
-      <el-alert title="添加物料信息"
+      <el-alert title="出库物料添加"
                 type="info"
                 center
                 show-icon
@@ -20,13 +20,13 @@
                 finish-status="success"
                 align-center>
         <el-step title="物料信息"></el-step>
-        <el-step title="申请情况"></el-step>
+        <el-step title="已添清单"></el-step>
 
       </el-steps>
 
-      <el-form ref="recordForm"
-               :model="recordForm"
-               :rules="recordFormRules"
+      <el-form ref="materialForm"
+               :model="materialForm"
+               :rules="materialFormRules"
                label-width="80px">
 
         <el-tabs v-model="activeIndex"
@@ -36,19 +36,20 @@
                        name="0">
             <el-form-item label="物料情况"
                           prop="status">
-              <el-radio v-model="recordForm.status"
+              <el-radio v-model="materialForm.status"
                         label="正常">正常</el-radio>
-              <el-radio v-model="recordForm.status"
+              <el-radio v-model="materialForm.status"
                         label="损坏">损坏</el-radio>
             </el-form-item>
             <el-form-item label="仓库位置"
-                          prop="warehouseId">
-              <el-select v-model="recordForm.warehouseId"
-                         placeholder="请选择仓库">
-                <el-option v-for="item in repoList"
+                          prop="warehouse">
+              <el-select v-model="materialForm.warehouse"
+                         placeholder="请选择仓库"
+                         value-key="key">
+                <el-option v-for="item in warehouseNames"
                            :key='item.key'
                            :label='item.value'
-                           :value="item.key"></el-option>
+                           :value="item"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="物料分类">
@@ -65,21 +66,26 @@
             </el-form-item>
 
             <el-form-item label="物料名称"
-                          prop="materialName">
-              <el-autocomplete class="inline-input"
-                               v-model="recordForm.materialName"
-                               :fetch-suggestions="querySearch"
-                               placeholder="请输入内容"
-                               @select="handleSelect"
-                               style="width:400px"
-                               :rows="2"
-                               type="textarea">
-              </el-autocomplete>
+                          prop="material">
+              <el-select v-model="materialForm.material"
+                         placeholder="请选择物料"
+                         value-key='id'
+                         @change="changeMaterialOption">
+                <el-option v-for="item in materialList"
+                           :key='item.id'
+                           :label='item.name'
+                           :value='item'>
+                  <span style="float: left">{{ item.name }}</span>
+                  <span style="float: right; color: #8492a6; font-size: 13px">{{ item.count }}</span>
+                </el-option>
+              </el-select>
             </el-form-item>
             <el-form-item label="物料数量">
               <el-col :span='8'>
-                <el-slider v-model="recordForm.count"
+                <el-slider v-model="materialForm.count"
                            :show-tooltip="false"
+                           :min=0
+                           :max="maxCount"
                            show-input>
                 </el-slider>
               </el-col>
@@ -87,17 +93,17 @@
 
             <el-form-item>
               <el-button type="success"
-                         @click="onSubmit">添加</el-button>
+                         @click="addToList">添加到申请单</el-button>
               <el-button type="primary"
                          @click="nextStep">查看申请单</el-button>
-              <el-button @click="resetForm('recordForm')">清空</el-button>
+              <el-button @click="resetForm('materialForm')">清空</el-button>
             </el-form-item>
 
           </el-tab-pane>
-          <el-tab-pane label="申请情况"
+          <el-tab-pane label="已添清单"
                        name="1">
             <!-- 申请单表 -->
-            <el-table :data="applicationItems"
+            <el-table :data="applicationItemList"
                       style="width: 100%"
                       height="300">
               <el-table-column type="index"></el-table-column>
@@ -130,36 +136,31 @@
                                label="操作"
                                width="120">
                 <template slot-scope="scope">
-                  <el-button @click.native.prevent="deleteRow(scope.$index, applicationItems)"
+                  <el-button @click.native.prevent="removeRow(scope.$index, applicationItemList)"
                              type="text"
-                             size="small">
-                    移除
-                  </el-button>
+                             size="small">移除</el-button>
                 </template>
               </el-table-column>
             </el-table>
             <br>
-            <el-form-item label="使用原因">
+            <el-form-item label="备注信息">
               <el-col :span="12">
                 <el-input type="textarea"
-                          v-model="recordForm.message"></el-input>
+                          v-model="applicationForm.message"></el-input>
               </el-col>
             </el-form-item>
             <el-form-item>
               <el-button type="primary"
-                         @click="submitApplyForm">立即申请</el-button>
+                         @click="alertSubmit">提交申请单</el-button>
               <el-button type="success"
-                         @click="preStep">继续添加</el-button>
-              <span slot="
-                         footer"
+                         @click="preStep">返回继续添加</el-button>
+              <span slot="footer"
                     class="dialog-footer">
                 <el-button>取 消</el-button>
                 <el-button type="primary">确 定</el-button>
               </span>
             </el-form-item>
-
           </el-tab-pane>
-
         </el-tabs>
       </el-form>
     </el-card>
@@ -171,21 +172,24 @@
 export default {
   data () {
     return {
-      restaurants: [],
-      recordForm: {
-        materialId: '',
-        materialName: '',
-        message: '',
-        count: 1,
-        warehouseId: '',
+      materialForm: {
+        material: [],
+        warehouse: [],
         categoryId: '',
+        specialLineId: '',
         status: '正常',
+        count: 1,
         type: '逐项出库'
       },
-
-      repoList: [],
+      applicationForm: {
+        message: '',
+        type: '逐项出库'
+      },
+      maxCount: 1,
+      warehouseNames: [],
+      applicationItemList: [],
       parentcateList: [],
-      applicationItems: [],
+      materialList: [],
       // 指定级联选择器的配置对象
       cascaderProps: {
         value: 'id',
@@ -197,11 +201,14 @@ export default {
       // 默认激活索引
       activeIndex: 0,
 
-      recordFormRules: {
-        warehouseId: [
+      materialFormRules: {
+        status: [
+          { required: true, message: '请选择物料情况', trigger: 'change' }
+        ],
+        warehouse: [
           { required: true, message: '请选择仓库位置', trigger: 'change' }
         ],
-        materialName: [
+        material: [
           { required: true, message: '请填写物料名称', trigger: 'change' }
         ]
       }
@@ -209,39 +216,23 @@ export default {
   },
   created () {
     this.getParentcateList()
-    this.listRepositories()
+    this.listWarehouses()
   },
   methods: {
-    querySearch (queryString, cb) {
-      var restaurants = this.restaurants
-      var results = queryString
-        ? restaurants.filter(this.createFilter(queryString))
-        : restaurants
-      // 调用 callback 返回建议列表的数据
-      cb(results)
-      console.log(this.recordForm)
-    },
-    createFilter (queryString) {
-      return restaurant => {
-        return (
-          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
-          0
-        )
-      }
-    },
-    handleSelect (item) {
-      this.recordForm.materialId = item.key
+
+    changeMaterialOption (item) {
+      this.maxCount = item.count
     },
     // 选择项发生变化触发这个函数
     parentCateChanged () {
-      // console.log(this.selectedKeys)
-      this.materialName = ''
+      console.log(this.selectedKeys)
+      this.materialList = undefined
+      this.materialForm.material = undefined
       if (this.selectedKeys !== undefined && this.selectedKeys.length > 1) {
-        this.recordForm.categoryId = this.selectedKeys[
-          this.selectedKeys.length - 1
-        ]
-        this.listMaterialNames()
+        this.materialForm.categoryId = this.selectedKeys[this.selectedKeys.length - 1]
+        this.materialForm.specialLineId = this.selectedKeys[0] // 专业线
       }
+      this.listMaterialOptions()
     },
     // 获取父级分类
     async getParentcateList () {
@@ -252,14 +243,14 @@ export default {
       }
       this.parentcateList = res.data
     },
-    onSubmit () {
+    addToList () {
       // 验证表单
-      this.$refs.recordForm.validate(async valid => {
+      this.$refs.materialForm.validate(async valid => {
         if (!valid) {
           return
         }
         // 提交申请单
-        this.submitApplyFormItem()
+        this.alertSubmitItem()
       })
     },
     resetForm (formName) {
@@ -267,26 +258,31 @@ export default {
       this.selectedKeys = []
     },
     // 提交申请单项
-    async submitApplyFormItem () {
-      const { data: res } = await this.$http.post('applyItem', this.recordForm)
+    async alertSubmitItem () {
+      const { data: res } = await this.$http.post('applyItem', {
+        materialName: this.materialForm.material.name,
+        materialId: this.materialForm.material.id,
+        warehouseId: this.materialForm.warehouse.key,
+        warehouseName: this.materialForm.warehouse.value,
+        categoryId: this.materialForm.categoryId,
+        specialLineId: this.materialForm.specialLineId,
+        count: this.materialForm.count,
+        status: this.materialForm.status,
+        type: this.materialForm.type
+      })
       if (res.meta.status !== 201) {
-        this.$message.error('添加成功失败！')
+        this.$message.error(res.meta.message)
         return
       }
-      this.clearForm()
+      this.resetForm('materialForm')
       this.$message.success('提交申请成功！')
     },
-    // 清空表单
-    clearForm () {
-      this.resetForm('recordForm')
-      // this.form.count = 1
-      // this.selectedKeys = []
-    },
+
     // 提交申请单
-    async submitApplyForm () {
-      const { data: res } = await this.$http.post('apply/message', {
-        message: this.recordForm.message,
-        type: this.recordForm.type
+    async alertSubmit () {
+      const { data: res } = await this.$http.put('apply/message', {
+        message: this.materialForm.message,
+        type: this.materialForm.type
       })
       if (res.meta.status !== 200) {
         return this.$message.error('提交申请失败！')
@@ -294,45 +290,43 @@ export default {
       this.$message.success('申请成功!')
       this.activeIndex = '0'
     },
-    // 获取申请单项列表
-    async listMaterialNames () {
-      const { data: res } = await this.$http.get('material/names', {
+    // 获取物料选项列表
+    async listMaterialOptions () {
+      const { data: res } = await this.$http.get('material/options', {
         params: {
-          warehouseId: this.recordForm.warehouseId,
-          categoryId: this.recordForm.categoryId,
-          status: this.recordForm.status
+          warehouseId: this.materialForm.warehouse.key,
+          categoryId: this.materialForm.categoryId,
+          status: this.materialForm.status
         }
       })
-
       if (res.meta.status !== 200) {
         return this.$message.error('获取商品列表失败！')
       }
-
-      this.restaurants = res.data
+      this.materialList = res.data
     },
     // 获取仓库列表
-    async listRepositories () {
+    async listWarehouses () {
       const { data: res } = await this.$http.get('warehouse/names')
 
       if (res.meta.status !== 200) {
         return this.$message.error('获取仓库列表失败！')
       }
 
-      this.repoList = res.data
+      this.warehouseNames = res.data
     },
     // 获取申请单项
     async listItems () {
       const { data: res } = await this.$http.get('applyItem', {
         params: {
-          type: this.recordForm.type
+          type: this.materialForm.type
         }
       })
 
       if (res.meta.status !== 200) {
         return this.$message.error('获取申请单列表失败！')
       }
-      this.applicationItems = res.data
-      return this.applicationItems
+      this.applicationItemList = res.data
+      return this.applicationItemList
     },
     async removeItem (id) {
       const { data: res } = await this.$http.delete('applyItem/' + id)
@@ -378,13 +372,12 @@ export default {
       }
       return true
     },
-    deleteRow (index, rows) {
+    removeRow (index, rows) {
       this.removeItem(rows[index].id)
       rows.splice(index, 1)
     }
   },
   mounted () {
-    // this.restaurants = this.loadAll()
   }
 }
 </script>
