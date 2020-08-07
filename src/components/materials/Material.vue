@@ -10,7 +10,6 @@
     <!-- 卡片视图区域 -->
     <!-- tab 页签区域 -->
     <el-tabs v-model="activeName"
-             @tab-click="shiftTabs"
              type="border-card">
       <el-tab-pane v-for='item in warehouseNames'
                    :key='item.key'
@@ -63,19 +62,18 @@
               <el-form-item label="专业线">
                 <span>{{ props.row.specialLine }}</span>
               </el-form-item>
-
               <el-form-item label="分类名">
                 <span>{{ props.row.categoryName }}</span>
               </el-form-item>
-
               <el-form-item label="所在仓库">
                 <span>{{ props.row.warehouseName }}</span>
               </el-form-item>
-
               <el-form-item label="更新时间">
                 <span>{{ props.row.updateTime }}</span>
               </el-form-item>
-
+              <el-form-item label="具体数量">
+                <span>{{ props.row.count }} {{ props.row.measureWord }}</span>
+              </el-form-item>
             </el-form>
           </template>
         </el-table-column>
@@ -124,8 +122,7 @@
       <!-- 修改分类的对话框 -->
       <el-dialog title="修改物料"
                  :visible.sync="editDialogVisible"
-                 width="50%"
-                 @close="editDialogClosed">
+                 width="50%">
         <el-form :model="editForm"
                  ref="editFormRef"
                  label-width="70px">
@@ -151,6 +148,10 @@
                         prop="count">
             <el-input v-model="editForm.count"
                       disabled />
+          </el-form-item>
+          <el-form-item label="计量单位"
+                        prop="measureWord">
+            <el-input v-model="editForm.measureWord" />
           </el-form-item>
         </el-form>
         <span slot="footer"
@@ -206,26 +207,14 @@
       <el-dialog title="日志信息"
                  :visible.sync="recordDialogVisible">
         <div class="block">
-          <el-timeline>
-            <el-timeline-item timestamp="2018/4/12"
+          <el-timeline :reverse="true">
+            <el-timeline-item v-for="item in logList"
+                              :key="item.id"
+                              :timestamp='item.updateTime'
                               placement="top">
               <el-card>
-                <h4>更新 Github 模板</h4>
-                <p>王小虎 提交于 2018/4/12 20:46</p>
-              </el-card>
-            </el-timeline-item>
-            <el-timeline-item timestamp="2018/4/3"
-                              placement="top">
-              <el-card>
-                <h4>更新 Github 模板</h4>
-                <p>王小虎 提交于 2018/4/3 20:46</p>
-              </el-card>
-            </el-timeline-item>
-            <el-timeline-item timestamp="2018/4/2"
-                              placement="top">
-              <el-card>
-                <h4>更新 Github 模板</h4>
-                <p>王小虎 提交于 2018/4/2 20:46</p>
+                <h4>{{item.userName}} {{item.message}}</h4>
+                <p>{{item.type}} {{item.count}}</p>
               </el-card>
             </el-timeline-item>
           </el-timeline>
@@ -282,7 +271,8 @@ export default {
       editDialogVisible: false,
       recordDialogVisible: false,
       // 查询到的分类信息对象
-      editForm: {}
+      editForm: {},
+      logList: []
     }
   },
   created () {
@@ -377,14 +367,14 @@ export default {
       this.editDialogVisible = true
     }, // 展示日志信息的弹框
     async showRecordDialog (id) {
-      // console.log(id)
-      // const { data: res } = await this.$http.get('material/' + id)
+      console.log(id)
+      const { data: res } = await this.$http.get('material/' + id + '/logs')
 
-      // if (res.meta.status !== 200) {
-      //   return this.$message.error('获取物料信息失败！')
-      // }
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取物料信息失败！')
+      }
 
-      // this.editForm = res.data
+      this.logList = res.data
       this.recordDialogVisible = true
     },
     // 点击按钮，添加新的物料
@@ -445,9 +435,7 @@ export default {
         // 发起修改用户信息的数据请求
         const { data: res } = await this.$http.put(
           'material/' + this.editForm.id,
-          {
-            name: this.editForm.name
-          }
+          this.editForm
         )
 
         if (res.meta.status !== 200) {

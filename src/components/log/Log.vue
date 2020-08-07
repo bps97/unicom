@@ -30,6 +30,8 @@
                                     :label="tp"
                                     :key="tp"
                                     border>{{tp}}</el-checkbox-button>
+                <el-checkbox-button border
+                                    @change="selectAll">全选</el-checkbox-button>
               </el-checkbox-group>
 
             </div>
@@ -45,7 +47,7 @@
         <!-- 日志列表区域 -->
         <el-table :data="recordList"
                   row-key="id"
-                  border="false"
+                  :border="false"
                   :cell-class-name="tableRowClassName"
                   :tree-props="{children: 'children'}">
           <el-table-column label="工单"
@@ -102,7 +104,7 @@
 </template>
 
 <script>
-const logTypes = ['无线', '线路', '装维', '传输', '数据', '大客户', '接入']
+const logTypes = ['无线', '传输', '数据', '大客户']
 
 export default {
   data () {
@@ -128,6 +130,13 @@ export default {
     console.log(this.activeName)
   },
   methods: {
+    selectAll () {
+      if (this.logForm.checkedspecialLine.length !== 4) {
+        this.logForm.checkedspecialLine = logTypes
+      } else {
+        this.logForm.checkedspecialLine = []
+      }
+    },
     tableRowClassName ({ row, column, rowIndex, columnIndex }) {
       if (columnIndex > 3 && columnIndex < 6) {
         if (row.children !== null) {
@@ -168,6 +177,7 @@ export default {
       this.warehouseNames = res.data
     },
     async searchLog () {
+      console.log(this.logForm.checkedspecialLine)
       // 提交申请单
       const { data: res } = await this.$http.get('record', {
         params: {

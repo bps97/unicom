@@ -4,7 +4,7 @@ module.exports = {
   env: {
     browser: true,
     node: true,
-    es6: true,
+    es6: true
   },
 
   extends: [
@@ -28,7 +28,7 @@ module.exports = {
     parser: 'babel-eslint'
   },
 
-  'extends': [
+  extends: [
     'plugin:vue/essential',
     '@vue/standard'
   ]
