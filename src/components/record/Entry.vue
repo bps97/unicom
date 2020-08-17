@@ -9,147 +9,101 @@
     <!-- 卡片视图区域 -->
     <el-card>
       <!-- 提示区域 -->
-      <el-alert title="入库物料添加"
-                type="info"
-                center
-                show-icon
-                :closable="false">
-      </el-alert>
+      <el-alert title="入库物料添加" type="info" center show-icon :closable="false"></el-alert>
       <!-- 步骤条区域 -->
-      <el-steps :active="activeIndex - 0"
-                finish-status="success"
-                align-center>
+      <el-steps :active="activeIndex - 0" finish-status="success" align-center>
         <el-step title="物料信息"></el-step>
         <el-step title="已添清单"></el-step>
-
       </el-steps>
 
-      <el-form ref="materialForm"
-               :model="materialForm"
-               :rules="materialFormRules"
-               label-width="80px">
-
-        <el-tabs v-model="activeIndex"
-                 :tab-position="'left'"
-                 :before-leave="beforeTabLeave">
-          <el-tab-pane label="物料信息"
-                       name="0"
-                       v-loading='loading'>
-            <el-form-item label="物料情况"
-                          prop="status">
-              <el-radio v-model="materialForm.status"
-                        label="正常">正常</el-radio>
-              <el-radio v-model="materialForm.status"
-                        label="损坏">损坏</el-radio>
+      <el-form
+        ref="materialForm"
+        :model="materialForm"
+        :rules="materialFormRules"
+        label-width="80px"
+      >
+        <el-tabs v-model="activeIndex" :tab-position="'left'" :before-leave="beforeTabLeave">
+          <el-tab-pane label="物料信息" name="0" v-loading="loading">
+            <el-form-item label="物料情况" prop="status">
+              <el-radio v-model="materialForm.status" label="正常">正常</el-radio>
+              <el-radio v-model="materialForm.status" label="损坏">损坏</el-radio>
             </el-form-item>
-            <el-form-item label="仓库位置"
-                          prop="warehouse">
-              <el-select v-model="materialForm.warehouse"
-                         placeholder="请选择仓库">
-                <el-option v-for="item in warehouseNames"
-                           :key='item.key'
-                           :label='item.value'
-                           :value="item"></el-option>
+            <el-form-item label="仓库位置" prop="warehouse">
+              <el-select v-model="materialForm.warehouse" placeholder="请选择仓库">
+                <el-option
+                  v-for="item in warehouseNames"
+                  :key="item.key"
+                  :label="item.value"
+                  :value="item"
+                ></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="物料分类">
-              <el-cascader props.expandTrigger="hover"
-                           :options="parentcateList"
-                           :props="cascaderProps"
-                           v-model="selectedKeys"
-                           @change="parentCateChanged"
-                           placeholder="请选择分类"
-                           clearable
-                           style="width:400px"
-                           props.checkStrictly>
-              </el-cascader>
+              <el-cascader
+                props.expandTrigger="hover"
+                :options="parentcateList"
+                :props="cascaderProps"
+                v-model="selectedKeys"
+                @change="parentCateChanged"
+                placeholder="请选择分类"
+                clearable
+                style="width:400px"
+                props.checkStrictly
+              ></el-cascader>
             </el-form-item>
-            <el-form-item label="物料名称"
-                          prop="materialName">
-              <el-autocomplete class="inline-input"
-                               v-model="materialForm.materialName"
-                               :fetch-suggestions="querySearch"
-                               placeholder="请输入内容"
-                               @select="handleSelect"
-                               style="width:400px"
-                               :rows="2"
-                               type="textarea">
-              </el-autocomplete>
+            <el-form-item label="物料名称" prop="materialName">
+              <el-autocomplete
+                class="inline-input"
+                v-model="materialForm.materialName"
+                :fetch-suggestions="querySearch"
+                placeholder="请输入内容"
+                @select="handleSelect"
+                style="width:400px"
+                :rows="2"
+                type="textarea"
+              ></el-autocomplete>
             </el-form-item>
             <el-form-item label="物料数量">
-              <el-col :span='10'>
-                <el-slider v-model="materialForm.count"
-                           :show-tooltip="false"
-                           :min="1"
-                           show-input>
-                </el-slider>
+              <el-col :span="10">
+                <el-slider v-model="materialForm.count" :show-tooltip="false" :min="1" show-input></el-slider>
               </el-col>
             </el-form-item>
             <el-form-item>
-              <el-button type="success"
-                         @click="addToList">添加到申请单</el-button>
-              <el-button type="primary"
-                         @click="nextStep">查看申请单</el-button>
+              <el-button type="success" @click="addToList">添加到申请单</el-button>
+              <el-button type="primary" @click="nextStep">查看申请单</el-button>
               <el-button @click="resetForm('materialForm')">清空</el-button>
             </el-form-item>
-
           </el-tab-pane>
-          <el-tab-pane label="已添清单"
-                       name="1">
+          <el-tab-pane label="已添清单" name="1">
             <!-- 已添清单 -->
-            <el-table :data="applicationItemList"
-                      style="width: 100%"
-                      height="300">
+            <el-table :data="applicationItemList" style="width: 100%" height="300">
               <el-table-column type="index"></el-table-column>
-              <el-table-column prop="materialName"
-                               label="物料名称">
-              </el-table-column>
-              <el-table-column prop="status"
-                               width="50px"
-                               align="center"
-                               label="物料状态">
-              </el-table-column>
-              <el-table-column prop="specialLine"
-                               width="50px"
-                               align="center"
-                               label="专业线">
-              </el-table-column>
-              <el-table-column prop="warehouseName"
-                               label="所在仓库"
-                               width="100">
-              </el-table-column>
-              <el-table-column prop="categoryName"
-                               label="所属分类"
-                               align="center">
-              </el-table-column>
-              <el-table-column prop="count"
-                               label="数量"
-                               width="100">
-              </el-table-column>
-              <el-table-column fixed="right"
-                               label="操作"
-                               width="120">
+              <el-table-column prop="materialName" label="物料名称"></el-table-column>
+              <el-table-column prop="status" width="50px" align="center" label="物料状态"></el-table-column>
+              <el-table-column prop="specialLine" width="50px" align="center" label="专业线"></el-table-column>
+              <el-table-column prop="warehouseName" label="所在仓库" width="100"></el-table-column>
+              <el-table-column prop="categoryName" label="所属分类" align="center"></el-table-column>
+              <el-table-column prop="count" label="数量" width="100"></el-table-column>
+              <el-table-column fixed="right" label="操作" width="120">
                 <template slot-scope="scope">
-                  <el-button @click.native.prevent="removeRow(scope.$index, applicationItemList)"
-                             type="text"
-                             size="small">移除</el-button>
+                  <el-button
+                    @click.native.prevent="removeRow(scope.$index, applicationItemList)"
+                    type="text"
+                    size="small"
+                  >移除</el-button>
                 </template>
               </el-table-column>
             </el-table>
-            <br>
+            <br />
             <el-form-item label="备注信息">
               <el-col :span="12">
-                <el-input type="textarea"
-                          v-model="applicationForm.message"></el-input>
+                <el-input type="textarea" v-model="applicationForm.message"></el-input>
               </el-col>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary"
-                         @click="alertSubmit">提交申请单</el-button>
-              <el-button type="success"
-                         @click="preStep">返回继续添加</el-button>
-              <span slot="footer"
-                    class="dialog-footer">
+              <el-button type="primary" @click="alertSubmit">提交申请单</el-button>
+              <el-button type="success" @click="preStep">返回继续添加</el-button>
+              <span slot="footer" class="dialog-footer">
                 <el-button>取 消</el-button>
                 <el-button type="primary">确 定</el-button>
               </span>

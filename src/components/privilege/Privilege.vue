@@ -9,23 +9,15 @@
 
     <!-- 卡片视图 -->
     <el-card>
-      <el-table :data="rightsList"
-                border
-                stripe>
+      <el-table :data="rightsList" border stripe>
         <el-table-column type="index"></el-table-column>
-        <el-table-column label="权限描述"
-                         prop="description"></el-table-column>
-        <el-table-column label="权限类型"
-                         prop="type"></el-table-column>
-        <el-table-column label="权限等级"
-                         prop="level">
+        <el-table-column label="权限描述" prop="description"></el-table-column>
+        <el-table-column label="权限类型" prop="type"></el-table-column>
+        <el-table-column label="权限等级" prop="level">
           <template slot-scope="scope">
-
-            <el-tag v-if="scope.row.privilegeLevel == 0">一级</el-tag>
-            <el-tag type="success"
-                    v-else-if="scope.row.privilegeLevel === 1">二级</el-tag>
-            <el-tag type="warning"
-                    v-else>三级</el-tag>
+            <el-tag v-if="scope.row.privilegeLevel === 0">一级</el-tag>
+            <el-tag type="success" v-else-if="scope.row.privilegeLevel === 1">二级</el-tag>
+            <el-tag type="warning" v-else>三级</el-tag>
           </template>
         </el-table-column>
       </el-table>

@@ -8,47 +8,34 @@
     </el-breadcrumb>
 
     <el-row justify="center">
-      <el-col :span='12'
-              :offset='6'
-              justify="center">
+      <el-col :span="12" :offset="6" justify="center">
         <el-card>
-
-          <el-form :model="ruleForm"
-                   status-icon
-                   :rules="rules"
-                   ref="ruleForm"
-                   label-width="100px"
-                   class="demo-ruleForm">
-            <el-form-item label="密码"
-                          prop="pass">
-              <el-input type="password"
-                        v-model="ruleForm.pass"
-                        autocomplete="off"></el-input>
+          <el-form
+            :model="ruleForm"
+            status-icon
+            :rules="rules"
+            ref="ruleForm"
+            label-width="100px"
+            class="demo-ruleForm"
+          >
+            <el-form-item label="密码" prop="pass">
+              <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="新密码"
-                          prop="newPass">
-              <el-input type="password"
-                        v-model="ruleForm.newPass"
-                        autocomplete="off"></el-input>
+            <el-form-item label="新密码" prop="newPass">
+              <el-input type="password" v-model="ruleForm.newPass" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="确认密码"
-                          prop="checkPass">
-              <el-input type="password"
-                        v-model="ruleForm.checkPass"
-                        autocomplete="off"></el-input>
+            <el-form-item label="确认密码" prop="checkPass">
+              <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary"
-                         @click="submitForm('ruleForm')">提交</el-button>
+              <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
               <el-button @click="resetForm('ruleForm')">重置</el-button>
             </el-form-item>
           </el-form>
-
         </el-card>
       </el-col>
-      <el-col :span='8'></el-col>
+      <el-col :span="8"></el-col>
     </el-row>
-
   </div>
 </template>
 <script>

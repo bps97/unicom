@@ -10,101 +10,66 @@
     <!-- 卡片视图区域 -->
     <el-card>
       <!-- 提示区域 -->
-      <el-alert title=""
-                type="info"
-                center
-                :closable="false">
-        <el-button type="text"
-                   icon="el-icon-download"
-                   circle
-                   @click="downloadTemplate">点击下载模板</el-button>
+      <el-alert title type="info" center :closable="false">
+        <el-button type="text" icon="el-icon-download" circle @click="downloadTemplate">点击下载模板</el-button>
       </el-alert>
       <!-- 步骤条区域 -->
-      <el-steps :active="activeIndex - 0"
-                finish-status="success"
-                align-center>
+      <el-steps :active="activeIndex - 0" finish-status="success" align-center>
         <el-step title="文件上传"></el-step>
         <el-step title="上传情况"></el-step>
-
       </el-steps>
-      <el-form ref="excelForm"
-               :model="excelForm"
-               label-width="80px">
-        <el-tabs v-model="activeIndex"
-                 :tab-position="'left'"
-                 :before-leave="beforeTabLeave">
-          <el-tab-pane label="文件上传"
-                       name="0">
+      <el-form ref="excelForm" :model="excelForm" label-width="80px">
+        <el-tabs v-model="activeIndex" :tab-position="'left'" :before-leave="beforeTabLeave">
+          <el-tab-pane label="文件上传" name="0">
             <el-row>
-              <el-col :span="8"
-                      :offset="1">
-                <el-upload ref="upload"
-                           class="uploadAssets"
-                           drag
-                           action=""
-                           :http-request="uploadSuccess"
-                           :limit="1"
-                           accept=".xls,.xlsx"
-                           :before-upload="beforeUpload"
-                           :show-file-list="true"
-                           :on-exceed="handleExceed"
-                           v-loading="loading">
+              <el-col :span="8" :offset="1">
+                <el-upload
+                  ref="upload"
+                  class="uploadAssets"
+                  drag
+                  action
+                  :http-request="uploadSuccess"
+                  :limit="1"
+                  accept=".xls, .xlsx"
+                  :before-upload="beforeUpload"
+                  :show-file-list="true"
+                  :on-exceed="handleExceed"
+                  v-loading="loading"
+                >
                   <i class="el-icon-receiving"></i>
-                  <div class="el-upload__text">点击或将文件拖拽到这里上传<br />支持扩展名：.xls、.xlsx（仅支持1个文件）</div>
-
+                  <div class="el-upload__text">
+                    点击或将文件拖拽到这里上传
+                    <br />支持扩展名：.xls、.xlsx（仅支持1个文件）
+                  </div>
                 </el-upload>
               </el-col>
-              <el-col :span="4"
-                      :offset="2">
-                <el-button type="primary"
-                           v-loading="loading"
-                           @click="uploadFile">导入</el-button>
+              <el-col :span="4" :offset="2">
+                <el-button type="primary" v-loading="loading" @click="uploadFile">导入</el-button>
               </el-col>
             </el-row>
-
           </el-tab-pane>
-          <el-tab-pane label="上传情况"
-                       name="1">
+          <el-tab-pane label="上传情况" name="1">
             <el-row>
-              <el-col :span="17"
-                      :offset="1">
-                <el-table :data="materialList"
-                          height="600px"
-                          border
-                          style="width: 100%"
-                          :cell-class-name="tableRowClassName">
-                  <el-table-column prop="materialName"
-                                   label="物料全称">
-                  </el-table-column>
-                  <el-table-column prop="status"
-                                   align="center"
-                                   width="50px"
-                                   label="物料状态">
-                  </el-table-column>
-                  <el-table-column prop="count"
-                                   align="center"
-                                   width="100px"
-                                   label="物料数量">
-                  </el-table-column>
-                  <el-table-column prop="warehouseName"
-                                   align="center"
-                                   width="100px"
-                                   label="仓库位置">
-                  </el-table-column>
-                  <el-table-column prop="categoryName"
-                                   align="center"
-                                   width="100px"
-                                   label="物料分类">
-                  </el-table-column>
-                  <el-table-column fixed="right"
-                                   label="操作"
-                                   width="50">
+              <el-col :span="17" :offset="1">
+                <el-table
+                  :data="materialList"
+                  height="600px"
+                  border
+                  style="width: 100%"
+                  :cell-class-name="tableRowClassName"
+                >
+                  <el-table-column prop="materialName" label="物料全称"></el-table-column>
+                  <el-table-column prop="status" align="center" width="50px" label="物料状态"></el-table-column>
+                  <el-table-column prop="count" align="center" width="100px" label="物料数量"></el-table-column>
+                  <el-table-column prop="warehouseName" align="center" width="100px" label="仓库位置"></el-table-column>
+                  <el-table-column prop="categoryName" align="center" width="100px" label="物料分类"></el-table-column>
+                  <el-table-column fixed="right" label="操作" width="50">
                     <template slot-scope="scope">
-                      <el-button @click.native.prevent="deleteRow(scope.$index, materialList)"
-                                 type="text"
-                                 size="small">
-                        移除
-                      </el-button>
+                      <el-button
+                        @click.native.prevent="deleteRow(scope.$index, materialList)"
+                        type="text"
+                        size="small"
+                      >移除</el-button>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -113,19 +78,20 @@
                 <el-row>
                   <el-col :offset="6">备注信息：</el-col>
                 </el-row>
-                <br>
+                <br />
                 <el-row>
                   <el-form-item>
-                    <el-input type="textarea"
-                              placeholder="请输入内容(可为空)"
-                              :rows="22"
-                              v-model="excelForm.message"></el-input>
+                    <el-input
+                      type="textarea"
+                      placeholder="请输入内容(可为空)"
+                      :rows="22"
+                      v-model="excelForm.message"
+                    ></el-input>
                   </el-form-item>
                 </el-row>
                 <el-row>
                   <el-form-item>
-                    <el-button type="primary"
-                               @click="onSubmit">确认无误</el-button>
+                    <el-button type="primary" @click="onSubmit">确认无误</el-button>
                   </el-form-item>
                 </el-row>
               </el-col>
@@ -133,14 +99,15 @@
             <el-row>
               <el-col :offset="1">
                 <!-- 分页区域 -->
-                <el-pagination @size-change="handleSizeChange"
-                               @current-change="handleCurrentChange"
-                               :current-page="queryInfo.page"
-                               :page-sizes="[3, 5, 10, 15]"
-                               :page-size="queryInfo.size"
-                               layout="total, sizes, prev, pager, next, jumper"
-                               :total="total">
-                </el-pagination>
+                <el-pagination
+                  @size-change="handleSizeChange"
+                  @current-change="handleCurrentChange"
+                  :current-page="queryInfo.page"
+                  :page-sizes="[3, 5, 10, 15]"
+                  :page-size="queryInfo.size"
+                  layout="total, sizes, prev, pager, next, jumper"
+                  :total="total"
+                ></el-pagination>
               </el-col>
             </el-row>
           </el-tab-pane>
@@ -239,10 +206,10 @@ export default {
         responseType: 'blob'
       }).then((res) => {
         // let prefix = this.mime.getExtension(res.data.type) // 根据类型获取文件后缀
-        let prefix = '.xlsx'
-        let data = new Blob([res.data])
-        let downloadUrl = window.URL.createObjectURL(data)
-        let anchor = document.createElement('a')
+        const prefix = '.xlsx'
+        const data = new Blob([res.data])
+        const downloadUrl = window.URL.createObjectURL(data)
+        const anchor = document.createElement('a')
         anchor.href = downloadUrl
         anchor.download = +new Date() + '.' + prefix
         anchor.click()

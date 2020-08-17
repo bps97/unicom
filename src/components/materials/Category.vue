@@ -11,147 +11,129 @@
     <el-card>
       <el-row>
         <el-col>
-          <el-popover placement="right"
-                      title="点击添加『物料分类』"
-                      trigger="hover"
-                      content="注意分类命名要有辨识度">
-            <el-button type="primary"
-                       slot="reference"
-                       @click="showAddCategoryDialog">添加分类</el-button>
+          <el-popover placement="right" title="点击添加『物料分类』" trigger="hover" content="注意分类命名要有辨识度">
+            <el-button type="primary" slot="reference" @click="showAddCategoryDialog">添加分类</el-button>
           </el-popover>
-
         </el-col>
       </el-row>
       <!-- tab 页签区域 -->
-      <el-tabs v-model="activeName"
-               @tab-click="shiftTabs">
-        <el-tab-pane v-for='item in specialLineList'
-                     :key='item.key'
-                     :label='item.value'
-                     :name='item.key' />
+      <el-tabs v-model="activeName" @tab-click="shiftTabs">
+        <el-tab-pane
+          v-for="item in specialLineList"
+          :key="item.key"
+          :label="item.value"
+          :name="item.key"
+        />
         <!-- 表格 -->
 
-        <el-table :data="categoryList"
-                  row-key="id"
-                  style="width: 100%;margin-bottom: 20px;"
-                  border
-                  height="484"
-                  stripe
-                  :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
-          <el-table-column prop="name"
-                           label="分类名称"
-                           sortable />
-          <el-table-column label="类别等级"
-                           width="100px"
-                           align="center">
+        <el-table
+          :data="categoryList"
+          row-key="id"
+          style="width: 100%;margin-bottom: 20px;"
+          border
+          height="484"
+          stripe
+          :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+        >
+          <el-table-column prop="name" label="分类名称" sortable />
+          <el-table-column label="类别等级" width="100px" align="center">
             <!-- 排序 -->
             <template slot-scope="scope">
-              <el-tag size="mini"
-                      v-if="scope.row.level===1">一级</el-tag>
-              <el-tag type="success"
-                      size="mini"
-                      v-else-if="scope.row.level===2">二级</el-tag>
-              <el-tag type="warning"
-                      size="mini"
-                      v-else>三级</el-tag>
+              <el-tag size="mini" v-if="scope.row.level===1">一级</el-tag>
+              <el-tag type="success" size="mini" v-else-if="scope.row.level===2">二级</el-tag>
+              <el-tag type="warning" size="mini" v-else>三级</el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="有效性"
-                           width="66px">
+          <el-table-column label="有效性" width="66px">
             <!-- 是否有效 -->
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.available"
-                         @change="closeAvailable(scope.row)" />
+              <el-switch v-model="scope.row.available" @change="closeAvailable(scope.row)" />
             </template>
           </el-table-column>
-          <el-table-column label="操作"
-                           width="200px"
-                           align="center">
+          <el-table-column label="操作" width="200px" align="center">
             <!-- 操作 -->
             <template slot-scope="scope">
-              <el-button type="primary"
-                         icon="el-icon-edit"
-                         size="mini"
-                         @click="showEditDialog(scope.row.id)">编辑</el-button>
-              <el-button type="danger"
-                         icon="el-icon-delete"
-                         size="mini"
-                         @click="removeById(scope.row.id)">删除</el-button>
+              <el-button
+                type="primary"
+                icon="el-icon-edit"
+                size="mini"
+                @click="showEditDialog(scope.row.id)"
+              >编辑</el-button>
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+                size="mini"
+                @click="removeById(scope.row.id)"
+              >删除</el-button>
             </template>
           </el-table-column>
         </el-table>
 
         <!-- 分页区域 -->
-        <el-pagination @size-change="handleSizeChange"
-                       @current-change="handleCurrentChange"
-                       :current-page="queryInfo.page"
-                       :page-sizes="[5, 8, 10, 15]"
-                       :page-size="queryInfo.size"
-                       layout="total, sizes, prev, pager, next, jumper"
-                       :total="total" />
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="queryInfo.page"
+          :page-sizes="[5, 8, 10, 15]"
+          :page-size="queryInfo.size"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+        />
       </el-tabs>
     </el-card>
 
     <!-- 修改分类的对话框 -->
-    <el-dialog title="修改分类"
-               :visible.sync="editDialogVisible"
-               width="50%"
-               @close="editDialogClosed">
-      <el-form :model="editForm"
-               ref="editFormRef"
-               label-width="70px">
+    <el-dialog title="修改分类" :visible.sync="editDialogVisible" width="50%" @close="editDialogClosed">
+      <el-form :model="editForm" ref="editFormRef" label-width="70px">
         <el-form-item label="名称">
           <el-input v-model="editForm.name" />
         </el-form-item>
-        <el-form-item label="专业线"
-                      prop="specialLine">
-          <el-input v-model="editForm.specialLine"
-                    disabled />
+        <el-form-item label="专业线" prop="specialLine">
+          <el-input v-model="editForm.specialLine" disabled />
         </el-form-item>
-        <el-form-item label="等级"
-                      prop="level">
-          <el-input v-model="editForm.level"
-                    disabled />
+        <el-form-item label="等级" prop="level">
+          <el-input v-model="editForm.level" disabled />
         </el-form-item>
       </el-form>
-      <span slot="footer"
-            class="dialog-footer">
+      <span slot="footer" class="dialog-footer">
         <el-button @click="editDialogVisible = false">取 消</el-button>
-        <el-button type="primary"
-                   @click="editCategoryInfo">确 定</el-button>
+        <el-button type="primary" @click="editCategoryInfo">确 定</el-button>
       </span>
     </el-dialog>
 
     <!-- 添加分类的对话框 -->
-    <el-dialog title="添加分类"
-               :visible.sync="addCategorygoryDialogVisible"
-               width="50%"
-               @close="addCategorygoryDialogClosed">
+    <el-dialog
+      title="添加分类"
+      :visible.sync="addCategorygoryDialogVisible"
+      width="50%"
+      @close="addCategorygoryDialogClosed"
+    >
       <!-- 添加分类的表单 -->
-      <el-form :model="addCategorygoryFrom"
-               :rules="addCategorygoryFromRules"
-               ref="addCategorygoryFromRef"
-               label-width="100px">
+      <el-form
+        :model="addCategorygoryFrom"
+        :rules="addCategorygoryFromRules"
+        ref="addCategorygoryFromRef"
+        label-width="100px"
+      >
         <el-form-item label="父级分类：">
           <!-- options 用来指定数据源 -->
           <!-- props 用来指定配置对象 -->
-          <el-cascader expand-trigger="hover"
-                       :options="parentCategoryList"
-                       :props="cascaderProps"
-                       v-model="selectedKeys"
-                       @change="parentCategoryChanged"
-                       clearable />
+          <el-cascader
+            expand-trigger="hover"
+            :options="parentCategoryList"
+            :props="cascaderProps"
+            v-model="selectedKeys"
+            @change="parentCategoryChanged"
+            clearable
+          />
         </el-form-item>
-        <el-form-item label="分类名称："
-                      prop="name">
+        <el-form-item label="分类名称：" prop="name">
           <el-input v-model="addCategorygoryFrom.name" />
         </el-form-item>
       </el-form>
-      <span slot="footer"
-            class="dialog-footer">
+      <span slot="footer" class="dialog-footer">
         <el-button @click="addCategorygoryDialogVisible = false">取 消</el-button>
-        <el-button type="primary"
-                   @click="addCategory">确 定</el-button>
+        <el-button type="primary" @click="addCategory">确 定</el-button>
       </span>
     </el-dialog>
   </div>

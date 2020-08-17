@@ -9,53 +9,46 @@
 
     <!-- 卡片视图区域 -->
     <!-- tab 页签区域 -->
-    <el-tabs v-model="activeName"
-             type="border-card">
-      <el-tab-pane v-for='item in warehouseNames'
-                   :key='item.key'
-                   :label='item.value'
-                   :name='item.key' />
+    <el-tabs v-model="activeName" type="border-card">
+      <el-tab-pane
+        v-for="item in warehouseNames"
+        :key="item.key"
+        :label="item.value"
+        :name="item.key"
+      />
       <el-row :gutter="20">
         <!-- 选择商品分类区域 -->
-        <el-col :span='5'>
-          <el-cascader expand-trigger="hover"
-                       :options="parentCategoryList"
-                       :props="cascaderProps"
-                       v-model="selectedKeys"
-                       @change="parentCategoryChanged" />
+        <el-col :span="5">
+          <el-cascader
+            expand-trigger="hover"
+            :options="parentCategoryList"
+            :props="cascaderProps"
+            v-model="selectedKeys"
+            @change="parentCategoryChanged"
+          />
         </el-col>
         <el-col :span="6">
-          <el-input placeholder="请输入关键字"
-                    v-model="queryInfo.key"
-                    clearable
-                    @clear="listMaterials">
-            <el-button slot="append"
-                       icon="el-icon-search"
-                       @click="listMaterials" />
+          <el-input placeholder="请输入关键字" v-model="queryInfo.key" clearable @clear="listMaterials">
+            <el-button slot="append" icon="el-icon-search" @click="listMaterials" />
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-popover placement="right"
-                      title="点击添加『物料』"
-                      trigger="hover"
-                      content="注意此处添加物料并不会修改仓库内物料数量">
-            <el-button type="primary"
-                       slot="reference"
-                       @click="showAddMaterialDialog">添加物料</el-button>
+          <el-popover
+            placement="right"
+            title="点击添加『物料』"
+            trigger="hover"
+            content="注意此处添加物料并不会修改仓库内物料数量"
+          >
+            <el-button type="primary" slot="reference" @click="showAddMaterialDialog">添加物料</el-button>
           </el-popover>
         </el-col>
       </el-row>
-      <br>
+      <br />
       <!-- table表格区域 -->
-      <el-table :data="materialList"
-                border
-                stripe
-                height="484">
+      <el-table :data="materialList" border stripe height="484">
         <el-table-column type="expand">
           <template slot-scope="props">
-            <el-form label-position="left"
-                     inline
-                     class="demo-table-expand">
+            <el-form label-position="left" inline class="demo-table-expand">
               <el-form-item label="物料ID">
                 <span>{{ props.row.id }}</span>
               </el-form-item>
@@ -78,140 +71,124 @@
           </template>
         </el-table-column>
         <!-- <el-table-column type="index" /> -->
-        <el-table-column label="物料名称"
-                         prop="name" />
-        <el-table-column label="损坏状态"
-                         prop="status"
-                         width="50px" />
-        <el-table-column label="物料数量"
-                         align="center"
-                         prop="count"
-                         width="80px" />
-        <el-table-column label="操作"
-                         width="175px">
+        <el-table-column label="物料名称" prop="name" />
+        <el-table-column label="损坏状态" prop="status" width="50px" />
+        <el-table-column label="物料数量" align="center" prop="count" width="80px" />
+        <el-table-column label="操作" width="175px">
           <template slot-scope="scope">
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+              @click="showEditDialog(scope.row.id)"
+            />
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              @click="removeById(scope.row.id)"
+            />
 
-            <el-button type="primary"
-                       icon="el-icon-edit"
-                       size="mini"
-                       @click="showEditDialog(scope.row.id)" />
-            <el-button type="danger"
-                       icon="el-icon-delete"
-                       size="mini"
-                       @click="removeById(scope.row.id)" />
-
-            <el-button type="success"
-                       icon="el-icon-view"
-                       size="mini"
-                       @click="showRecordDialog(scope.row.id)" />
-
+            <el-button
+              type="success"
+              icon="el-icon-view"
+              size="mini"
+              @click="showRecordDialog(scope.row.id)"
+            />
           </template>
         </el-table-column>
       </el-table>
 
       <!-- 分页区域 -->
-      <el-pagination @size-change="handleSizeChange"
-                     @current-change="handleCurrentChange"
-                     :current-page="queryInfo.pagenum"
-                     :page-sizes="[5, 8, 10, 15]"
-                     :page-size="queryInfo.size"
-                     layout="total, sizes, prev, pager, next, jumper"
-                     :total="total"
-                     background />
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="queryInfo.pagenum"
+        :page-sizes="[5, 8, 10, 15]"
+        :page-size="queryInfo.size"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+        background
+      />
 
       <!-- 修改分类的对话框 -->
-      <el-dialog title="修改物料"
-                 :visible.sync="editDialogVisible"
-                 width="50%">
-        <el-form :model="editForm"
-                 ref="editFormRef"
-                 label-width="70px">
+      <el-dialog title="修改物料" :visible.sync="editDialogVisible" width="50%">
+        <el-form :model="editForm" ref="editFormRef" label-width="70px">
           <el-form-item label="名称">
             <el-input v-model="editForm.name" />
           </el-form-item>
-          <el-form-item label="专业线"
-                        prop="specialLine">
-            <el-input v-model="editForm.specialLine"
-                      disabled />
+          <el-form-item label="专业线" prop="specialLine">
+            <el-input v-model="editForm.specialLine" disabled />
           </el-form-item>
-          <el-form-item label="分类"
-                        prop="categoryName">
-            <el-input v-model="editForm.categoryName"
-                      disabled />
+          <el-form-item label="分类" prop="categoryName">
+            <el-input v-model="editForm.categoryName" disabled />
           </el-form-item>
-          <el-form-item label="仓库"
-                        prop="warehouseName">
-            <el-input v-model="editForm.warehouseName"
-                      disabled />
+          <el-form-item label="仓库" prop="warehouseName">
+            <el-input v-model="editForm.warehouseName" disabled />
           </el-form-item>
-          <el-form-item label="数量"
-                        prop="count">
-            <el-input v-model="editForm.count"
-                      disabled />
+          <el-form-item label="数量" prop="count">
+            <el-input v-model="editForm.count" disabled />
           </el-form-item>
-          <el-form-item label="计量单位"
-                        prop="measureWord">
+          <el-form-item label="计量单位" prop="measureWord">
             <el-input v-model="editForm.measureWord" />
           </el-form-item>
         </el-form>
-        <span slot="footer"
-              class="dialog-footer">
+        <span slot="footer" class="dialog-footer">
           <el-button @click="editDialogVisible = false">取 消</el-button>
-          <el-button type="primary"
-                     @click="editCategoryInfo">确 定</el-button>
+          <el-button type="primary" @click="editCategoryInfo">确 定</el-button>
         </span>
       </el-dialog>
 
       <!-- 添加物料的对话框 -->
-      <el-dialog title="添加物料"
-                 :visible.sync="addMaterialDialogVisible"
-                 width="50%"
-                 @close="addMaterialDialogClosed">
+      <el-dialog
+        title="添加物料"
+        :visible.sync="addMaterialDialogVisible"
+        width="50%"
+        @close="addMaterialDialogClosed"
+      >
         <!-- 添加分类的表单 -->
 
-        <el-form :model="addMaterialForm"
-                 ref="addMaterialFormRef"
-                 label-width="100px">
+        <el-form :model="addMaterialForm" ref="addMaterialFormRef" label-width="100px">
           <el-form-item label="父级分类：">
             <!-- options 用来指定数据源 -->
             <!-- props 用来指定配置对象 -->
-            <el-cascader expand-trigger="hover"
-                         :options="parentCategoryList_add"
-                         :props="cascaderProps_add"
-                         v-model="selectedKeys_add"
-                         @change="parentCategoryChanged_add" />
+            <el-cascader
+              expand-trigger="hover"
+              :options="parentCategoryList_add"
+              :props="cascaderProps_add"
+              v-model="selectedKeys_add"
+              @change="parentCategoryChanged_add"
+            />
           </el-form-item>
-          <el-form-item label="仓库位置："
-                        prop="warehouseId">
-            <el-select v-model="addMaterialForm.warehouseId"
-                       placeholder="请选择仓库">
-              <el-option v-for="item in warehouseNames"
-                         :key='item.key'
-                         :label='item.value'
-                         :value="item.key" />
+          <el-form-item label="仓库位置：" prop="warehouseId">
+            <el-select v-model="addMaterialForm.warehouseId" placeholder="请选择仓库">
+              <el-option
+                v-for="item in warehouseNames"
+                :key="item.key"
+                :label="item.value"
+                :value="item.key"
+              />
             </el-select>
           </el-form-item>
           <el-form-item label="物料名称：">
-            <el-input prop="name"
-                      v-model="addMaterialForm.name" />
+            <el-input prop="name" v-model="addMaterialForm.name" />
           </el-form-item>
         </el-form>
-        <span slot="footer"
-              class="dialog-footer">
+        <span slot="footer" class="dialog-footer">
           <el-button @click="addMaterialDialogVisible = false">取 消</el-button>
-          <el-button type="primary"
-                     @click="addMaterial">确 定</el-button>
+          <el-button type="primary" @click="addMaterial">确 定</el-button>
         </span>
       </el-dialog>
 
-      <el-dialog title="日志信息"
-                 :visible.sync="recordDialogVisible">
+      <el-dialog title="日志信息" :visible.sync="recordDialogVisible">
         <div class="block">
           <el-timeline :reverse="true">
-            <el-timeline-item v-for="item in logList"
-                              :key="item.id"
-                              :timestamp='item.updateTime'
-                              placement="top">
+            <el-timeline-item
+              v-for="item in logList"
+              :key="item.id"
+              :timestamp="item.updateTime"
+              placement="top"
+            >
               <el-card>
                 <h4>{{item.userName}} {{item.message}}</h4>
                 <p>{{item.type}} {{item.count}}</p>

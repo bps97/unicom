@@ -3,51 +3,48 @@
     <!-- 头部区域 -->
     <el-header>
       <div>
-        <img src="../assets/logo.png"
-             alt="">
+        <img src="../assets/logo.png" alt />
         <span>仓管系统</span>
       </div>
-      <el-menu class="el-menu-demo"
-               mode="horizontal"
-               background-color="#333854"
-               text-color="#fff"
-               active-text-color="#ffd04b">
+      <el-menu
+        class="el-menu-demo"
+        mode="horizontal"
+        background-color="#333854"
+        text-color="#fff"
+        active-text-color="#ffd04b"
+      >
         <el-submenu index="1">
           <template slot="title">账户</template>
-          <el-menu-item index="2-1"
-                        @click="logout">退出
-          </el-menu-item>
-          <el-menu-item index="2-2"
-                        @click="changePwd">修改密码
-          </el-menu-item>
+          <el-menu-item index="2-1" @click="logout">退出</el-menu-item>
+          <el-menu-item index="2-2" @click="changePwd">修改密码</el-menu-item>
         </el-submenu>
         <!-- <el-menu-item index="2">
           <a href="#"
              target="_blank">关于我们</a>
-        </el-menu-item> -->
+        </el-menu-item>-->
       </el-menu>
     </el-header>
     <!-- 页面主体区域 -->
     <el-container>
       <!-- 侧边栏 -->
       <el-aside :width="isCollapse ? '66px' : '202px'">
-        <div class="toggle-button"
-             style="font-size:20px"
-             @click="toggleCollapse"><i class="el-icon-s-unfold"></i></div>
+        <div class="toggle-button" style="font-size:20px" @click="toggleCollapse">
+          <i class="el-icon-s-unfold"></i>
+        </div>
         <!-- 侧边栏菜单区域 -->
         <!--unique-opened 展开唯一一项子菜单-->
         <!--:collapse=ture表示折叠-->
-        <el-menu active-text-color="#409EFF"
-                 unique-opened
-                 :collapse="isCollapse"
-                 :collapse-transition="false"
-                 router
-                 :default-active="this.$router.history.current.path">
+        <el-menu
+          active-text-color="#409EFF"
+          unique-opened
+          :collapse="isCollapse"
+          :collapse-transition="false"
+          router
+          :default-active="this.$router.history.current.path"
+        >
           <!-- :default-active="this.$route.history.current.path" -->
           <!-- 一级菜单 -->
-          <el-submenu :index="item.id + ''"
-                      v-for="item in menulist"
-                      :key="item.id">
+          <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
             <!-- 设置v-for语句并未每个item绑定一个key值，这里用id -->
             <!-- 一级菜单的模板区域 -->
             <template slot="title">
@@ -58,10 +55,12 @@
             </template>
 
             <!-- 二级菜单 -->
-            <el-menu-item :index="'/' + subItem.path"
-                          v-for="subItem in item.children"
-                          :key="subItem.id"
-                          @click="saveNavState('/' + subItem.path)">
+            <el-menu-item
+              :index="'/' + subItem.path"
+              v-for="subItem in item.children"
+              :key="subItem.id"
+              @click="saveNavState('/' + subItem.path)"
+            >
               <template slot="title">
                 <!-- 图标 -->
                 <i class="el-icon-menu"></i>

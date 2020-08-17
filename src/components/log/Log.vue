@@ -10,96 +10,66 @@
     <!-- 卡片视图区域 -->
 
     <!-- tab 页签区域 -->
-    <el-tabs v-model="activeName"
-             @tab-click="shiftTabs"
-             type="border-card">
-      <el-tab-pane v-for='item in warehouseNames'
-                   :key='item.key'
-                   :label='item.value'
-                   :name='item.key' />
+    <el-tabs v-model="activeName" @tab-click="shiftTabs" type="border-card">
+      <el-tab-pane
+        v-for="item in warehouseNames"
+        :key="item.key"
+        :label="item.value"
+        :name="item.key"
+      />
       <el-row>
         <el-col :span="20">
-          <el-form ref="logForm"
-                   :model="logForm"
-                   label-width="80px">
+          <el-form ref="logForm" :model="logForm" label-width="80px">
             <!-- 多选框 -->
             <div style="margin-bottom: 20px">
-              <el-checkbox-group v-model="logForm.checkedspecialLine"
-                                 size="medium">
-                <el-checkbox-button v-for="tp in specialLines"
-                                    :label="tp"
-                                    :key="tp"
-                                    border>{{tp}}</el-checkbox-button>
-                <el-checkbox-button border
-                                    @change="selectAll">全选</el-checkbox-button>
+              <el-checkbox-group v-model="logForm.checkedspecialLine" size="medium">
+                <el-checkbox-button v-for="tp in specialLines" :label="tp" :key="tp" border>{{tp}}</el-checkbox-button>
+                <el-checkbox-button border @change="selectAll">全选</el-checkbox-button>
               </el-checkbox-group>
-
             </div>
           </el-form>
         </el-col>
         <el-col :span="2">
-          <el-button type="primary"
-                     icon="el-icon-search"
-                     @click="searchLog">搜索</el-button>
+          <el-button type="primary" icon="el-icon-search" @click="searchLog">搜索</el-button>
         </el-col>
       </el-row>
       <el-row>
         <!-- 日志列表区域 -->
-        <el-table :data="recordList"
-                  row-key="id"
-                  :border="false"
-                  :cell-class-name="tableRowClassName"
-                  :tree-props="{children: 'children'}">
-          <el-table-column label="工单"
-                           align="center">
-
-            <el-table-column label="记录类型"
-                             sortable
-                             width="100"
-                             prop="type" />
-            <el-table-column label="申请用户"
-                             sortable
-                             width="100"
-                             prop="userName" />
-            <el-table-column label="出入库情况"
-                             prop="message" />
+        <el-table
+          :data="recordList"
+          row-key="id"
+          :border="false"
+          :cell-class-name="tableRowClassName"
+          :tree-props="{children: 'children'}"
+        >
+          <el-table-column label="工单" align="center">
+            <el-table-column label="记录类型" sortable width="100" prop="type" />
+            <el-table-column label="申请用户" sortable width="100" prop="userName" />
+            <el-table-column label="出入库情况" prop="message" />
           </el-table-column>
 
-          <el-table-column label="物料"
-                           align="center">
-            <el-table-column label="名称"
-                             prop="materialName"
-                             align="center"
-                             width="400" />
-            <el-table-column label="状态"
-                             align="center"
-                             prop="status"
-                             width="80" />
+          <el-table-column label="物料" align="center">
+            <el-table-column label="名称" prop="materialName" align="center" width="400" />
+            <el-table-column label="状态" align="center" prop="status" width="80" />
           </el-table-column>
-          <el-table-column label="物料数量"
-                           prop="count"
-                           width="80" />
-          <el-table-column label="分类类型"
-                           prop="categoryName" />
-          <el-table-column label="工单时间"
-                           sortable
-                           align="center"
-                           prop="createTime"
-                           width="100" />
-
+          <el-table-column label="物料数量" prop="count" width="80" />
+          <el-table-column label="分类类型" prop="categoryName" />
+          <el-table-column label="工单时间" sortable align="center" prop="createTime" width="100" />
         </el-table>
       </el-row>
 
       <!-- 分页区域 -->
-      <el-pagination @size-change="handleSizeChange"
-                     @current-change="handleCurrentChange"
-                     :current-page="queryInfo.page"
-                     :page-sizes="[3, 5, 10, 15]"
-                     :page-size="queryInfo.size"
-                     layout="total, sizes, prev, pager, next, jumper"
-                     :total="total" />
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="queryInfo.page"
+        :page-sizes="[3, 5, 10, 15]"
+        :page-size="queryInfo.size"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      />
     </el-tabs>
-    <br>
+    <br />
   </div>
 </template>
 

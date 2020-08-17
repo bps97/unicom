@@ -1,15 +1,15 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-const Login = () => import(/* webpackChunkName: "Base_Page" */ '../components/Login.vue')
-const Home = () => import(/* webpackChunkName: "Base_Page" */ '../components/Home.vue')
-const Welcome = () => import(/* webpackChunkName: "Base_Page" */ '../components/Welcome.vue')
+const Home = () => import(/* webpackChunkName: "Base" */ '../components/Home.vue')
+const Welcome = () => import(/* webpackChunkName: "Base" */ '../components/Welcome.vue')
 
+const Login = () => import(/* webpackChunkName: "Account" */ '../components/Login.vue')
 const Users = () => import(/* webpackChunkName: "Account" */ '../components/user/Users.vue')
 const Pwd = () => import(/* webpackChunkName: "Account" */ '../components/user/Password.vue')
 
-const Privilege = () => import(/* webpackChunkName: "Account" */ '../components/privilege/Privilege.vue')
-const Role = () => import(/* webpackChunkName: "Account" */ '../components/privilege/Role.vue')
+const Privilege = () => import(/* webpackChunkName: "Privilege" */ '../components/privilege/Privilege.vue')
+const Role = () => import(/* webpackChunkName: "Privilege" */ '../components/privilege/Role.vue')
 
 const Categories = () => import(/* webpackChunkName: "Materials" */ '../components/materials/Category.vue')
 const Params = () => import(/* webpackChunkName: "Materials" */ '../components/materials/Params.vue')

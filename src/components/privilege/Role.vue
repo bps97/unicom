@@ -9,14 +9,10 @@
 
     <!-- 卡片视图 -->
     <el-card>
-      <el-table :data="roleList"
-                border
-                stripe>
+      <el-table :data="roleList" border stripe>
         <el-table-column type="index"></el-table-column>
-        <el-table-column label="角色名称"
-                         prop="name"></el-table-column>
-        <el-table-column label="角色描述"
-                         prop="description"></el-table-column>
+        <el-table-column label="角色名称" prop="name"></el-table-column>
+        <el-table-column label="角色描述" prop="description"></el-table-column>
       </el-table>
     </el-card>
   </div>
