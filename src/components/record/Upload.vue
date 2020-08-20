@@ -187,7 +187,7 @@ export default {
       this.fileName = file.file.name
     },
     async listApplyItems () {
-      const { data: res } = await this.$http.get('/applyItem/list', {
+      const { data: res } = await this.$http.get('/apply/list', {
         params: {
           current: this.queryInfo.page,
           size: this.queryInfo.size,
@@ -250,7 +250,7 @@ export default {
       this.loading = true
       this.$http({
         method: 'post',
-        url: 'applyItem/upload',
+        url: 'apply/upload',
         headers: { AccessToken: window.sessionStorage.getItem('token') },
         data: this.filesList,
         params: this.contents
@@ -280,7 +280,7 @@ export default {
         })
     },
     async removeItem (id) {
-      const { data: res } = await this.$http.delete('applyItem/' + id)
+      const { data: res } = await this.$http.delete('apply/' + id)
 
       if (res.meta.status !== 200) {
         return this.$message.error('删除失败！')

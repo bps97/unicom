@@ -219,7 +219,7 @@ export default {
     },
     // 提交申请单项
     async alertSubmitItem () {
-      const { data: res } = await this.$http.post('applyItem', {
+      const { data: res } = await this.$http.post('apply', {
         materialName: this.materialForm.material.name,
         materialId: this.materialForm.material.id,
         warehouseId: this.materialForm.warehouse.key,
@@ -289,7 +289,7 @@ export default {
       return this.applicationItemList
     },
     async removeItem (id) {
-      const { data: res } = await this.$http.delete('applyItem/' + id)
+      const { data: res } = await this.$http.delete('apply/' + id)
 
       if (res.meta.status !== 200) {
         return this.$message.error('删除失败！')

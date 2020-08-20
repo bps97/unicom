@@ -215,7 +215,7 @@ export default {
       })
     },
     async checkMaterial () {
-      const { data: res } = await this.$http.get('applyItem/material/check', {
+      const { data: res } = await this.$http.get('apply/material/check', {
         params: {
           materialName: this.materialForm.materialName,
           warehouseId: this.materialForm.warehouse.key,
@@ -241,7 +241,7 @@ export default {
     },
     // 提交申请单项
     async alertSubmitItem () {
-      const { data: res } = await this.$http.post('applyItem', {
+      const { data: res } = await this.$http.post('apply', {
         materialId: this.materialForm.materialId,
         materialName: this.materialForm.materialName,
         warehouseId: this.materialForm.warehouse.key,
@@ -285,7 +285,7 @@ export default {
     },
     // 获取申请单项
     async listApplicationItems () {
-      const { data: res } = await this.$http.get('applyItem', {
+      const { data: res } = await this.$http.get('apply', {
         params: {
           type: this.applicationForm.type
         }
@@ -298,7 +298,7 @@ export default {
       return this.applicationItemList
     },
     async removeItem (id) {
-      const { data: res } = await this.$http.delete('applyItem/' + id)
+      const { data: res } = await this.$http.delete('apply/' + id)
       if (res.meta.status !== 200) {
         return this.$message.error('删除失败！')
       }
