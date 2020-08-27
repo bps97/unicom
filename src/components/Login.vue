@@ -42,7 +42,7 @@ export default {
       // 这是登录表单的数据绑定对象
       loginForm: {
         username: '',
-        password: '123456'
+        password: ''
       },
       loginFormRules: {
         //   验证用户名

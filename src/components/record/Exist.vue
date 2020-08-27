@@ -276,7 +276,7 @@ export default {
     },
     // 获取申请单项
     async listItems () {
-      const { data: res } = await this.$http.get('applyItem', {
+      const { data: res } = await this.$http.get('apply', {
         params: {
           type: this.materialForm.type
         }
