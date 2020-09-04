@@ -89,14 +89,14 @@ export default {
       // 自定义图表
       iconsObj: {
         '1270245105376067585': 'iconfont icon-user',
-        '1270245436524851202': 'iconfont icon-tijikongjian',
+        '1270245436524851202': 'iconfont icon-users',
         '1270271513129332737': 'iconfont icon-shangpin',
-        '1270248374752120834': 'iconfont icon-users',
+        '1270248374752120834': 'iconfont icon-tijikongjian',
         '1270248374739537921': 'iconfont icon-baobiao',
         '1275324486427385857': 'iconfont icon-danju'
       },
       // 是否折叠
-      isCollapse: false,
+      isCollapse: true,
       // 被激活的链接地址
       activePath: ''
     }

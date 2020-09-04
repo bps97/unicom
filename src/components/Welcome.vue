@@ -48,6 +48,12 @@
         circle
         @click="downloadTemplate('丽水联通网络部物资管理办法（20200728）.doc')"
       >丽水联通网络部物资管理办法（20200728）.doc</el-button>
+      <el-button
+        type="text"
+        icon="el-icon-download"
+        circle
+        @click="downloadTemplate('仓管系统操作说明20200827.doc')"
+      >仓管系统操作说明20200827.doc</el-button>
     </el-card>
   </div>
 </template>
