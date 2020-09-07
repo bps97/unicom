@@ -29,7 +29,6 @@
         <el-table-column label="姓名" width="100px" align="center" prop="name"></el-table-column>
         <el-table-column label="邮箱" align="center" prop="email"></el-table-column>
         <el-table-column label="电话" align="center" width="112px" prop="mobile"></el-table-column>
-        <el-table-column label="角色" align="center" prop="roleName" width="100px"></el-table-column>
         <el-table-column label="状态" align="center" width="66px">
           <template slot-scope="scope">
             <el-switch v-model="scope.row.available" @change="userStateChanged(scope.row)"></el-switch>
@@ -76,7 +75,7 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="queryInfo.current"
+        :current-page="queryInfo.page"
         :page-sizes="[1, 5, 8, 10]"
         :page-size="queryInfo.size"
         layout="total, sizes, prev, pager, next, jumper"
@@ -131,19 +130,26 @@
       width="50%"
       @close="setRoleDialogClosed"
     >
-      <div>
-        <p>当前的用户：{{userInfo.username}}</p>
-        <p>当前的角色：{{userInfo.roleName}}</p>
-        <p>
-          分配新角色：
-          <el-select v-model="selectedRoleId" placeholder="请选择">
-            <el-option v-for="item in rolesList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-          </el-select>
-        </p>
-      </div>
+      <p>当前的用户：{{userInfo.username}}</p>
+      <p>
+        当前的角色：
+        <el-tag
+          v-for="role in userInfo.roles"
+          :key="role.id"
+          closable
+          type="success"
+          @close="handleClose(role, userInfo)"
+        >{{role.name}}</el-tag>
+      </p>
+      <p>
+        分配新角色：
+        <el-select v-model="selectedRoleIds" multiple placeholder="请选择">
+          <el-option v-for="item in rolesList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+      </p>
       <span slot="footer" class="dialog-footer">
         <el-button @click="setRoleDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveRoleInfo">确 定</el-button>
+        <el-button type="primary" @click="saveRoleInfo">确认分配新角色</el-button>
       </span>
     </el-dialog>
   </div>
@@ -180,7 +186,7 @@ export default {
       queryInfo: {
         key: '',
         // 当前的页数
-        current: 1,
+        page: 1,
         // 当前每页显示多少条数据
         size: 8
       },
@@ -227,15 +233,16 @@ export default {
       // 所有角色的数据列表
       rolesList: [],
       // 已选中的角色Id值
-      selectedRoleId: ''
+      selectedRoleIds: ''
     }
   },
   created () {
     this.getuserList()
   },
   methods: {
+
     async getuserList () {
-      const { data: res } = await this.$http.get('account', {
+      const { data: res } = await this.$http.get('account/page', {
         params: this.queryInfo
       })
       if (res.status !== 200) {
@@ -254,7 +261,7 @@ export default {
     // 监听 页码值 改变的事件
     handleCurrentChange (newPage) {
       console.log(newPage)
-      this.queryInfo.current = newPage
+      this.queryInfo.page = newPage
       this.getuserList()
     },
     // 监听 switch 开关状态的改变
@@ -278,7 +285,7 @@ export default {
       this.$refs.addFormRef.validate(async valid => {
         if (!valid) return
         // 可以发起添加用户的网络请求
-        const { data: res } = await this.$http.post('account', this.addForm)
+        const { data: res } = await this.$http.post('account/add', this.addForm)
 
         if (res.status !== 201) {
           this.$message.error('添加用户失败！')
@@ -363,7 +370,7 @@ export default {
       this.$message.success('删除用户成功！')
       this.getuserList()
     },
-    // 根据Id删除对应的用户信息
+    // 重置密码
     async resetPwdById (id) {
       // 弹框询问用户是否删除数据
       const confirmResult = await this.$confirm(
@@ -404,18 +411,24 @@ export default {
 
       this.rolesList = res.data
 
+      var temp = []
+      userInfo.roles.forEach(function (x, k) {
+        if (x.id !== 'default_role') { temp[k] = x.id }
+      })
+      this.selectedRoleIds = temp
+
       this.setRoleDialogVisible = true
     },
     // 点击按钮，分配角色
     async saveRoleInfo () {
-      if (!this.selectedRoleId) {
+      if (!this.selectedRoleIds) {
         return this.$message.error('请选择要分配的角色！')
       }
-
-      const { data: res } = await this.$http.put(
-        `account/${this.userInfo.id}/roleId/${this.selectedRoleId}`
+      const { data: res } = await this.$http.put(`/role/roles/accountId=${this.userInfo.id}`,
+        {
+          roleIds: this.selectedRoleIds
+        }
       )
-
       if (res.status !== 200) {
         return this.$message.error('更新角色失败！')
       }
@@ -424,9 +437,25 @@ export default {
       this.getuserList()
       this.setRoleDialogVisible = false
     },
+    async handleClose (userInfo, role) {
+      const { data: res } = await this.$http.delete(`role/${userInfo.id}/accountId=${role.id}`)
+      if (res.status !== 200) {
+        return this.$message.error('删除角色失败！')
+      }
+      console.log(res)
+      this.userInfo.roles.splice(this.userInfo.roles.indexOf(role), 1)
+
+      var temp = []
+      this.userInfo.roles.forEach(function (x, k) {
+        if (x.id !== 'default_role') { temp[k] = x.id }
+      })
+      this.selectedRoleIds = temp
+
+      this.getuserList()
+    },
     // 监听分配角色对话框的关闭事件
     setRoleDialogClosed () {
-      this.selectedRoleId = ''
+      this.selectedRoleIds = ''
       this.userInfo = {}
     }
   }
@@ -434,4 +463,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-tag + .el-tag {
+  margin-left: 10px;
+}
 </style>

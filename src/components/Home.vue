@@ -51,7 +51,7 @@
               <!-- 图标 -->
               <i :class="iconsObj[item.id]"></i>
               <!-- 文本 -->
-              <span>{{item.authName}}</span>
+              <span>{{item.name}}</span>
             </template>
 
             <!-- 二级菜单 -->
@@ -65,7 +65,7 @@
                 <!-- 图标 -->
                 <i class="el-icon-menu"></i>
                 <!-- 文本 -->
-                <span>{{subItem.authName}}</span>
+                <span>{{subItem.name}}</span>
               </template>
             </el-menu-item>
           </el-submenu>
@@ -88,12 +88,12 @@ export default {
       menulist: [],
       // 自定义图表
       iconsObj: {
-        '1270245105376067585': 'iconfont icon-user',
-        '1270245436524851202': 'iconfont icon-users',
-        '1270271513129332737': 'iconfont icon-shangpin',
-        '1270248374752120834': 'iconfont icon-tijikongjian',
-        '1270248374739537921': 'iconfont icon-baobiao',
-        '1275324486427385857': 'iconfont icon-danju'
+        '69f7800fee8a11eaa24600ffa2265402': 'iconfont icon-user',
+        '9503dccaee8a11eaa24600ffa2265402': 'iconfont icon-users',
+        af8ae701ee8a11eaa24600ffa2265402: 'iconfont icon-shangpin',
+        aacb9a40ee8a11eaa24600ffa2265402: 'iconfont icon-tijikongjian',
+        a89f3a6cee8a11eaa24600ffa2265402: 'iconfont icon-baobiao',
+        b5fff352ee8a11eaa24600ffa2265402: 'iconfont icon-danju'
       },
       // 是否折叠
       isCollapse: true,
@@ -111,7 +111,7 @@ export default {
     },
     // 获取所有的菜单
     async listMenus () {
-      const { data: res } = await this.$http.get('/menu/menus')
+      const { data: res } = await this.$http.get('/menu/list')
       if (res.status !== 200) return this.$message.error(res.message)
       this.menulist = res.data
       console.log(res)

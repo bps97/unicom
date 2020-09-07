@@ -4,7 +4,8 @@ import {
   Submenu, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col, Table, TableColumn,
   Switch, Tooltip, Pagination, Dialog, MessageBox, Tag, Cascader, Alert, Tabs, TabPane,
   Steps, Step, CheckboxGroup, CheckboxButton, Upload, Select, Option, Timeline, TimelineItem,
-  Autocomplete, Slider, Radio, Loading, Popover, Badge
+  Autocomplete, Slider, Radio, Loading, Popover, Badge, Checkbox
+
 } from 'element-ui'
 
 Vue.use(Button)
@@ -36,6 +37,7 @@ Vue.use(Tabs)
 Vue.use(TabPane)
 Vue.use(Steps)
 Vue.use(Step)
+Vue.use(Checkbox)
 Vue.use(CheckboxGroup)
 Vue.use(CheckboxButton)
 Vue.use(Upload)
