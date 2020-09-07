@@ -238,7 +238,7 @@ export default {
       const { data: res } = await this.$http.get('account', {
         params: this.queryInfo
       })
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取用户列表失败！')
       }
       this.userList = res.data.records
@@ -263,7 +263,7 @@ export default {
       const { data: res } = await this.$http.put(
         `account/${userinfo.id}/available/${userinfo.available}`
       )
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         userinfo.available = !userinfo.available
         return this.$message.error('更新用户状态失败！')
       }
@@ -280,7 +280,7 @@ export default {
         // 可以发起添加用户的网络请求
         const { data: res } = await this.$http.post('account', this.addForm)
 
-        if (res.meta.status !== 201) {
+        if (res.status !== 201) {
           this.$message.error('添加用户失败！')
         }
 
@@ -296,7 +296,7 @@ export default {
       // console.log(id)
       const { data: res } = await this.$http.get('account/' + id)
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('查询用户信息失败！')
       }
 
@@ -321,7 +321,7 @@ export default {
           }
         )
 
-        if (res.meta.status !== 200) {
+        if (res.status !== 200) {
           return this.$message.error('更新用户信息失败！')
         }
 
@@ -356,7 +356,7 @@ export default {
 
       const { data: res } = await this.$http.delete('account/' + id)
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('删除用户失败！')
       }
 
@@ -385,7 +385,7 @@ export default {
 
       const { data: res } = await this.$http.put('account/' + id + '/password')
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error(res.meta.message)
       }
 
@@ -398,7 +398,7 @@ export default {
 
       // 在展示对话框之前，获取所有角色的列表
       const { data: res } = await this.$http.get('role/list')
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取角色列表失败！')
       }
 
@@ -416,7 +416,7 @@ export default {
         `account/${this.userInfo.id}/roleId/${this.selectedRoleId}`
       )
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('更新角色失败！')
       }
 

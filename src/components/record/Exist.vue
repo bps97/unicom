@@ -198,7 +198,7 @@ export default {
     async getParentcateList () {
       const { data: res } = await this.$http.get('category/menus', {})
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取父级分类数据失败！')
       }
       this.parentcateList = res.data
@@ -230,7 +230,7 @@ export default {
         status: this.materialForm.status,
         type: this.materialForm.type
       })
-      if (res.meta.status !== 201) {
+      if (res.status !== 201) {
         this.$message.error(res.meta.message)
         return
       }
@@ -244,7 +244,7 @@ export default {
         message: this.materialForm.message,
         type: this.materialForm.type
       })
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('提交申请失败！')
       }
       this.$message.success('申请成功!')
@@ -259,7 +259,7 @@ export default {
           status: this.materialForm.status
         }
       })
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取商品列表失败！')
       }
       this.materialList = res.data
@@ -268,7 +268,7 @@ export default {
     async listWarehouses () {
       const { data: res } = await this.$http.get('warehouse/names')
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取仓库列表失败！')
       }
 
@@ -282,7 +282,7 @@ export default {
         }
       })
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取申请单列表失败！')
       }
       this.applicationItemList = res.data
@@ -291,7 +291,7 @@ export default {
     async removeItem (id) {
       const { data: res } = await this.$http.delete('apply/' + id)
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('删除失败！')
       }
     },

@@ -245,7 +245,7 @@ export default {
     // 获取所有的商品分类列表
     async getcateList () {
       const { data: res } = await this.$http.get('category/menus')
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取商品分类失败！')
       }
 
@@ -282,7 +282,7 @@ export default {
         }
       )
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取参数列表失败！')
       }
 
@@ -317,7 +317,7 @@ export default {
           }
         )
 
-        if (res.meta.status !== 201) {
+        if (res.status !== 201) {
           return this.$message.error('添加参数失败！')
         }
 
@@ -336,7 +336,7 @@ export default {
         }
       )
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取参数信息失败！')
       }
 
@@ -358,7 +358,7 @@ export default {
           { attr_name: this.editForm.attr_name, attr_sel: this.activeName }
         )
 
-        if (res.meta.status !== 200) {
+        if (res.status !== 200) {
           return this.$message.error('修改参数失败！')
         }
 
@@ -389,7 +389,7 @@ export default {
         `categories/${this.cateId}/attributes/${attrId}`
       )
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('删除参数失败！')
       }
 
@@ -422,7 +422,7 @@ export default {
         }
       )
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('修改参数项失败！')
       }
 

@@ -195,7 +195,7 @@ export default {
         }
       })
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取物料列表失败！')
       }
       this.materialList = res.data.records
@@ -236,7 +236,7 @@ export default {
         type: this.excelForm.type
       })
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error(res.meta.message)
       }
       // this.materialList = res.data.records
@@ -258,10 +258,10 @@ export default {
         .then(res => {
           console.log(res)
           // let data = JSON.parse(aesDecrypt(res.data.content))
-          if (res.data.meta.status === 200) {
+          if (res.data.status === 200) {
             // 提示修改成功
             this.$message.success('导入成功！')
-          } else if (res.data.meta.status === 500) {
+          } else if (res.data.status === 500) {
             this.$message.error(res.data.meta.message)
           }
           console.log(res.data)
@@ -282,7 +282,7 @@ export default {
     async removeItem (id) {
       const { data: res } = await this.$http.delete('apply/' + id)
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('删除失败！')
       }
     },

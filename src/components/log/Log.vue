@@ -141,7 +141,7 @@ export default {
     async listWarehouseNames () {
       const { data: res } = await this.$http.get('warehouse/names')
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取仓库列表失败！')
       }
       this.warehouseNames = res.data
@@ -158,7 +158,7 @@ export default {
         }
       })
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         this.recordList = undefined
         return this.$message.error(res.meta.message)
       }

@@ -261,7 +261,7 @@ export default {
     async listWarehouseNames () {
       const { data: res } = await this.$http.get('warehouse/names')
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取仓库列表失败！')
       }
       this.warehouseNames = res.data
@@ -324,7 +324,7 @@ export default {
       }
       const { data: res } = await this.$http.delete(`material/${id}`)
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('删除失败！')
       }
 
@@ -336,7 +336,7 @@ export default {
       // console.log(id)
       const { data: res } = await this.$http.get('material/' + id)
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取物料信息失败！')
       }
 
@@ -347,7 +347,7 @@ export default {
       console.log(id)
       const { data: res } = await this.$http.get('material/' + id + '/logs')
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取物料信息失败！')
       }
 
@@ -363,7 +363,7 @@ export default {
           this.addMaterialForm
         )
 
-        if (res.meta.status !== 201) {
+        if (res.status !== 201) {
           return this.$message.error('新增物料失败！')
         }
         this.$message.success('新增物料成功！')
@@ -376,7 +376,7 @@ export default {
     async getParentcateList () {
       const { data: res } = await this.$http.get('category/menus', {})
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取父级分类数据失败！')
       }
 
@@ -395,7 +395,7 @@ export default {
           warehouseId: this.activeName
         }
       })
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         this.materialList = undefined
         return this.$message.error(res.meta.message)
       }
@@ -415,7 +415,7 @@ export default {
           this.editForm
         )
 
-        if (res.meta.status !== 200) {
+        if (res.status !== 200) {
           return this.$message.error('更新物料信息失败！')
         }
         // 提示修改成功

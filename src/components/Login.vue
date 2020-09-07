@@ -82,7 +82,7 @@ export default {
           'account/login',
           this.loginForm
         )
-        if (res.meta.status !== 200) return this.$message.error('登录失败') // success
+        if (res.status !== 200) return this.$message.error('登录失败') // success
         this.$message.success('登录成功')
         // token只在会话期间生效 所以保存在sessionStorage
         window.sessionStorage.setItem('token', res.data.value)

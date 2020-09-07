@@ -34,7 +34,7 @@ export default {
     // 获取角色列表
     async listRoles () {
       const { data: res } = await this.$http.get('role/list')
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取权限列表失败！')
       }
       this.roleList = res.data

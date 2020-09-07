@@ -199,7 +199,7 @@ export default {
     async getParentcateList () {
       const { data: res } = await this.$http.get('category/menus', {})
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取父级分类数据失败！')
       }
       this.parentcateList = res.data
@@ -227,7 +227,7 @@ export default {
           type: this.materialForm.type
         }
       })
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error(res.meta.message)
       }
       this.materialForm.materialId = res.data.id
@@ -252,7 +252,7 @@ export default {
         status: this.materialForm.status,
         type: this.materialForm.type
       })
-      if (res.meta.status !== 201) {
+      if (res.status !== 201) {
         return this.$message.error(res.meta.message)
       }
       this.resetForm('materialForm') // 清空表单
@@ -269,7 +269,7 @@ export default {
         }
       })
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取商品列表失败！')
       }
       this.materialnames = res.data
@@ -278,7 +278,7 @@ export default {
     async listWarehouses () {
       const { data: res } = await this.$http.get('warehouse/names')
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取仓库列表失败！' + res.meta.message)
       }
       this.warehouseNames = res.data
@@ -291,7 +291,7 @@ export default {
         }
       })
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取申请单列表失败！' + res.meta.message)
       }
       this.applicationItemList = res.data
@@ -299,7 +299,7 @@ export default {
     },
     async removeItem (id) {
       const { data: res } = await this.$http.delete('apply/' + id)
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('删除失败！')
       }
     },
@@ -331,7 +331,7 @@ export default {
     // 提交申请单
     async submitApplication () {
       const { data: res } = await this.$http.put('apply/message', this.applicationForm)
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('提交申请失败！' + res.meta.message)
       }
       this.$message.success('申请成功!')

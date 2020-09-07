@@ -102,7 +102,7 @@ export default {
           newPassword: this.ruleForm.newPass
         }
       )
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         this.$message.error(res.meta.message)
       }
       this.$message.success('修改密码成功！')

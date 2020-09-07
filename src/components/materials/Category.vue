@@ -239,7 +239,7 @@ export default {
 
     async listSpecialLine () {
       const { data: res } = await this.$http.get('category/specialLine')
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取专业线标签失败！')
       }
       this.specialLineList = res.data
@@ -250,7 +250,7 @@ export default {
       const { data: res } = await this.$http.put(
         `category/${user.id}/available/${user.available}`
       )
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         user.available = !user.available
         return this.$message.error('更新分类有效性失败！')
       }
@@ -267,7 +267,7 @@ export default {
         }
       })
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取商品分类失败！')
       }
 
@@ -284,7 +284,7 @@ export default {
     async listParentCategories () {
       const { data: res } = await this.$http.get('category/menus', {})
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('获取父级分类数据失败！')
       }
 
@@ -301,7 +301,7 @@ export default {
           this.addCategorygoryFrom
         )
 
-        if (res.meta.status !== 201) {
+        if (res.status !== 201) {
           return this.$message.error('添加分类失败！')
         }
 
@@ -315,7 +315,7 @@ export default {
       // console.log(id)
       const { data: res } = await this.$http.get('category/' + id)
 
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('查询分类信息失败！')
       }
 
@@ -348,7 +348,7 @@ export default {
 
       const { data: res } = await this.$http.delete('category/' + id)
       console.log(res)
-      if (res.meta.status !== 200) {
+      if (res.status !== 200) {
         return this.$message.error('删除该分类失败！')
       }
 
@@ -368,7 +368,7 @@ export default {
           }
         )
 
-        if (res.meta.status !== 200) {
+        if (res.status !== 200) {
           return this.$message.error('更新分类信息失败！')
         }
         // 提示修改成功
