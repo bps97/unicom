@@ -29,6 +29,7 @@
         <el-table-column label="姓名" width="100px" align="center" prop="name"></el-table-column>
         <el-table-column label="邮箱" align="center" prop="email"></el-table-column>
         <el-table-column label="电话" align="center" width="112px" prop="mobile"></el-table-column>
+        <el-table-column label="角色" align="center" prop="roleName"></el-table-column>
         <el-table-column label="状态" align="center" width="66px">
           <template slot-scope="scope">
             <el-switch v-model="scope.row.available" @change="userStateChanged(scope.row)"></el-switch>
@@ -246,7 +247,7 @@ export default {
         params: this.queryInfo
       })
       if (res.status !== 200) {
-        return this.$message.error('获取用户列表失败！')
+        return this.$message.error(res.message)
       }
       this.userList = res.data.records
       this.total = res.data.total
@@ -272,7 +273,7 @@ export default {
       )
       if (res.status !== 200) {
         userinfo.available = !userinfo.available
-        return this.$message.error('更新用户状态失败！')
+        return this.$message.error(res.message)
       }
       this.$message.success('更新用户状态成功！')
     },
@@ -288,7 +289,7 @@ export default {
         const { data: res } = await this.$http.post('account/add', this.addForm)
 
         if (res.status !== 201) {
-          this.$message.error('添加用户失败！')
+          this.$message.error(res.message)
         }
 
         this.$message.success('添加用户成功！')
@@ -304,7 +305,7 @@ export default {
       const { data: res } = await this.$http.get('account/' + id)
 
       if (res.status !== 200) {
-        return this.$message.error('查询用户信息失败！')
+        return this.$message.error(res.message)
       }
 
       this.editForm = res.data
@@ -329,7 +330,7 @@ export default {
         )
 
         if (res.status !== 200) {
-          return this.$message.error('更新用户信息失败！')
+          return this.$message.error(res.message)
         }
 
         // 关闭对话框
@@ -364,7 +365,7 @@ export default {
       const { data: res } = await this.$http.delete('account/' + id)
 
       if (res.status !== 200) {
-        return this.$message.error('删除用户失败！')
+        return this.$message.error(res.message)
       }
 
       this.$message.success('删除用户成功！')
@@ -393,7 +394,7 @@ export default {
       const { data: res } = await this.$http.put('account/' + id + '/password')
 
       if (res.status !== 200) {
-        return this.$message.error(res.meta.message)
+        return this.$message.error(res.message)
       }
 
       this.$message.success('重置密码成功，为123456！')
@@ -406,7 +407,7 @@ export default {
       // 在展示对话框之前，获取所有角色的列表
       const { data: res } = await this.$http.get('role/list')
       if (res.status !== 200) {
-        return this.$message.error('获取角色列表失败！')
+        return this.$message.error(res.message)
       }
 
       this.rolesList = res.data
@@ -422,7 +423,7 @@ export default {
     // 点击按钮，分配角色
     async saveRoleInfo () {
       if (!this.selectedRoleIds) {
-        return this.$message.error('请选择要分配的角色！')
+        return this.$message.error('分配错误')
       }
       const { data: res } = await this.$http.put(`/role/roles/accountId=${this.userInfo.id}`,
         {
@@ -430,7 +431,7 @@ export default {
         }
       )
       if (res.status !== 200) {
-        return this.$message.error('更新角色失败！')
+        return this.$message.error(res.message)
       }
 
       this.$message.success('更新角色成功！')
@@ -440,7 +441,7 @@ export default {
     async handleClose (userInfo, role) {
       const { data: res } = await this.$http.delete(`role/${userInfo.id}/accountId=${role.id}`)
       if (res.status !== 200) {
-        return this.$message.error('删除角色失败！')
+        return this.$message.error(res.message)
       }
       console.log(res)
       this.userInfo.roles.splice(this.userInfo.roles.indexOf(role), 1)

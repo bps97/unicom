@@ -149,6 +149,10 @@
         <!-- 添加分类的表单 -->
 
         <el-form :model="addMaterialForm" ref="addMaterialFormRef" label-width="100px">
+          <el-form-item label="物料情况" prop="status">
+            <el-radio v-model="addMaterialForm.status" label="正常">正常</el-radio>
+            <el-radio v-model="addMaterialForm.status" label="损坏">损坏</el-radio>
+          </el-form-item>
           <el-form-item label="父级分类：">
             <!-- options 用来指定数据源 -->
             <!-- props 用来指定配置对象 -->
@@ -243,7 +247,8 @@ export default {
       addMaterialForm: {
         name: '',
         warehouseId: '',
-        categoryId: ''
+        categoryId: '',
+        status: '正常'
       },
       editDialogVisible: false,
       recordDialogVisible: false,
@@ -364,7 +369,7 @@ export default {
         )
 
         if (res.status !== 201) {
-          return this.$message.error('新增物料失败！')
+          return this.$message.error(res.message)
         }
         this.$message.success('新增物料成功！')
         this.addMaterialDialogVisible = false
@@ -388,7 +393,7 @@ export default {
     async listMaterials () {
       const { data: res } = await this.$http.get('material', {
         params: {
-          current: this.queryInfo.page,
+          page: this.queryInfo.page,
           size: this.queryInfo.size,
           categoryId: this.queryInfo.categoryId,
           key: this.queryInfo.key,
@@ -416,7 +421,7 @@ export default {
         )
 
         if (res.status !== 200) {
-          return this.$message.error('更新物料信息失败！')
+          return this.$message.error(res.message)
         }
         // 提示修改成功
         this.$message.success('更新物料信息成功！')

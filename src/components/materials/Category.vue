@@ -261,7 +261,7 @@ export default {
     async listCategories () {
       const { data: res } = await this.$http.get('category/list', {
         params: {
-          current: this.queryInfo.page,
+          page: this.queryInfo.page,
           size: this.queryInfo.size,
           specialLineId: this.activeName
         }
@@ -302,7 +302,7 @@ export default {
         )
 
         if (res.status !== 201) {
-          return this.$message.error('添加分类失败！')
+          return this.$message.error(res.message)
         }
 
         this.$message.success('添加分类成功！')
@@ -369,7 +369,7 @@ export default {
         )
 
         if (res.status !== 200) {
-          return this.$message.error('更新分类信息失败！')
+          return this.$message.error(res.message)
         }
         // 提示修改成功
         this.$message.success('更新分类信息成功！')

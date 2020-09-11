@@ -148,10 +148,9 @@ export default {
     },
     async searchLog () {
       console.log(this.logForm.checkedspecialLine)
-      // 提交申请单
       const { data: res } = await this.$http.get('record', {
         params: {
-          current: this.queryInfo.page,
+          page: this.queryInfo.page,
           size: this.queryInfo.size,
           warehouseId: this.activeName,
           specialLines: this.logForm.checkedspecialLine.toString()

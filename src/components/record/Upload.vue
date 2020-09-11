@@ -189,7 +189,7 @@ export default {
     async listApplyItems () {
       const { data: res } = await this.$http.get('/apply/list', {
         params: {
-          current: this.queryInfo.page,
+          page: this.queryInfo.page,
           size: this.queryInfo.size,
           type: this.contents.type
         }
