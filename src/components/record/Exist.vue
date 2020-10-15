@@ -133,8 +133,8 @@ export default {
   data () {
     return {
       materialForm: {
-        material: [],
-        warehouse: [],
+        material: '',
+        warehouse: '',
         categoryId: '',
         specialLineId: '',
         status: '正常',

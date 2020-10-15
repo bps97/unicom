@@ -45,7 +45,7 @@
       </el-row>
       <br />
       <!-- table表格区域 -->
-      <el-table :data="materialList" border stripe height="484">
+      <el-table :data="materialList" border stripe :max-height="pageHeight-300">
         <el-table-column type="expand">
           <template slot-scope="props">
             <el-form label-position="left" inline class="demo-table-expand">
@@ -254,11 +254,13 @@ export default {
       recordDialogVisible: false,
       // 查询到的分类信息对象
       editForm: {},
-      logList: []
+      logList: [],
+      pageHeight: ''
     }
   },
   created () {
     // 先获取父级分类的数据列表
+    this.pageHeight = `${document.documentElement.clientHeight}`
     this.getParentcateList()
     this.listWarehouseNames()
   },

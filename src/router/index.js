@@ -22,6 +22,7 @@ const Exist = () => import(/* webpackChunkName: "Records" */ '../components/reco
 const Entry = () => import(/* webpackChunkName: "Records" */ '../components/record/Entry.vue')
 const LogInfo = () => import(/* webpackChunkName: "Records" */ '../components/log/LogInfo.vue')
 const Rollback = () => import(/* webpackChunkName: "Records" */ '../components/log/Rollback.vue')
+const Reporting = () => import(/* webpackChunkName: "Records" */ '../components/log/Reporting.vue')
 
 Vue.use(VueRouter)
 
@@ -44,6 +45,7 @@ const router = new VueRouter({
         { path: '/exist', component: Exist },
         { path: '/entry', component: Entry },
         { path: '/logs', component: LogInfo },
+        { path: '/reports', component: Reporting },
         { path: '/rollback', component: Rollback },
         { path: '/privileges', component: Privilege },
         { path: '/roles', component: Role },

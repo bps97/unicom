@@ -65,7 +65,13 @@
             </el-form-item>
             <el-form-item label="物料数量">
               <el-col :span="10">
-                <el-slider v-model="materialForm.count" :show-tooltip="false" :min="1" show-input></el-slider>
+                <el-slider
+                  v-model="materialForm.count"
+                  :show-tooltip="false"
+                  :min="1"
+                  show-input
+                  max="300"
+                ></el-slider>
               </el-col>
             </el-form-item>
             <el-form-item>

@@ -18,43 +18,27 @@
         :name="item.key"
       />
       <el-row>
-        <el-col :span="20">
-          <el-form ref="logForm" :model="logForm" label-width="80px">
-            <!-- 多选框 -->
-            <div style="margin-bottom: 20px">
-              <el-checkbox-group v-model="logForm.checkedspecialLine" size="medium">
-                <el-checkbox-button v-for="tp in specialLines" :label="tp" :key="tp" border>{{tp}}</el-checkbox-button>
-                <el-checkbox-button border @change="selectAll">全选</el-checkbox-button>
-              </el-checkbox-group>
-            </div>
-          </el-form>
-        </el-col>
-        <el-col :span="2">
-          <el-button type="primary" icon="el-icon-search" @click="searchLog">搜索</el-button>
-        </el-col>
-      </el-row>
-      <el-row>
         <!-- 日志列表区域 -->
         <el-table
           :data="recordList"
-          row-key="id"
           :border="false"
-          :cell-class-name="tableRowClassName"
-          :tree-props="{children: 'children'}"
+          :max-height="pageHeight-300"
         >
-          <el-table-column label="工单" align="center">
-            <el-table-column label="记录类型" sortable width="100" prop="type" />
-            <el-table-column label="申请用户" sortable width="100" prop="userName" />
-            <el-table-column label="出入库情况" prop="message" />
+          <el-table-column label="记录类型" sortable width="100" prop="type" />
+          <el-table-column label="申请用户" sortable width="100" prop="userName" />
+          <el-table-column label="出入库情况" prop="message" />
+          <el-table-column label="工单时间" sortable align="center" prop="createTime"/>
+          <el-table-column label="操作" width="200px" align="center">
+            <!-- 操作 -->
+            <template slot-scope="scope">
+              <el-button
+                type="primary"
+                icon="el-icon-refresh-right"
+                size="mini"
+                @click="showEditDialog(scope.row.id)"
+              >回滚</el-button>
+            </template>
           </el-table-column>
-
-          <el-table-column label="物料" align="center">
-            <el-table-column label="名称" prop="materialName" align="center" width="400" />
-            <el-table-column label="状态" align="center" prop="status" width="80" />
-          </el-table-column>
-          <el-table-column label="物料数量" prop="count" width="80" />
-          <el-table-column label="分类类型" prop="categoryName" />
-          <el-table-column label="工单时间" sortable align="center" prop="createTime" width="100" />
         </el-table>
       </el-row>
 
@@ -74,7 +58,6 @@
 </template>
 
 <script>
-const logTypes = ['无线', '传输', '数据', '大客户']
 
 export default {
   data () {
@@ -88,44 +71,22 @@ export default {
       total: 0,
       warehouseNames: {},
       recordList: undefined,
-      specialLines: logTypes,
       activeName: '1270283833125527553',
       logForm: {
-        checkedspecialLine: []
-      }
+        checkedSpecialLine: ['大客户', '数据', '传输', '装维', '接入', '无线']
+      },
+      pageHeight: 0,
+      pageSizeList: [5, 8, 10, 20]
     }
   },
   created () {
+    this.pageHeight = `${document.documentElement.clientHeight}`
     this.listWarehouseNames()
-    console.log(this.activeName)
+    this.searchLog()
   },
   methods: {
-    selectAll () {
-      if (this.logForm.checkedspecialLine.length !== 4) {
-        this.logForm.checkedspecialLine = logTypes
-      } else {
-        this.logForm.checkedspecialLine = []
-      }
-    },
-    tableRowClassName ({ row, column, rowIndex, columnIndex }) {
-      if (columnIndex > 3 && columnIndex < 6) {
-        if (row.children !== null) {
-          if (row.children.length > 0) {
-            // return 'warning-row'
-          }
-        } else {
-          return 'success-row'
-        }
-      }
-      return 'none-border'
-    },
     // 切换标签
     shiftTabs () {
-      // console.log(this.activeName)
-      // this.cateData.forEach(item => console.log(item.id))
-      // var temp = this.cateData.filter(item => item.id === this.activeName)[0]
-      // this.cateList = temp.children != null ? temp.children : []
-      // this.total = this.cateList.length
     },
 
     // 监听 size 改变
@@ -147,13 +108,11 @@ export default {
       this.warehouseNames = res.data
     },
     async searchLog () {
-      console.log(this.logForm.checkedspecialLine)
-      const { data: res } = await this.$http.get('record', {
+      const { data: res } = await this.$http.get('record/page', {
         params: {
           page: this.queryInfo.page,
           size: this.queryInfo.size,
-          warehouseId: this.activeName,
-          specialLines: this.logForm.checkedspecialLine
+          warehouseId: this.activeName
         }
       })
 
@@ -162,7 +121,6 @@ export default {
         return this.$message.error(res.meta.message)
       }
 
-      // console.log(res.data)
       this.recordList = res.data.records
       this.total = res.data.total
     }
@@ -171,26 +129,7 @@ export default {
 </script>
 
 <style lang="less" >
-.treeTable {
-  margin-top: 15px;
-}
-
-.el-cascader {
-  width: 100%;
-}
-.el-table .warning-row {
-  background: oldlace;
-  border-left: none;
-  border-right: none;
-}
-
-.el-table .success-row {
-  background: #f0f9eb;
-  border-left: none;
-  border-right: none;
-}
-.el-table .none-border {
-  border-left: none;
-  border-right: none;
-}
+  .treeTable {
+    margin-top: 15px;
+  }
 </style>

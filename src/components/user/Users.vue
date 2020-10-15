@@ -23,7 +23,7 @@
       <br />
 
       <!-- 用户列表区域 -->
-      <el-table :data="userList" border stripe height="473">
+      <el-table border stripe :max-height="pageHeight-300" :data="userList">
         <!-- <el-table-column type="index"></el-table-column> -->
         <el-table-column label="账号" align="center" prop="username"></el-table-column>
         <el-table-column label="姓名" width="100px" align="center" prop="name"></el-table-column>
@@ -77,7 +77,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="queryInfo.page"
-        :page-sizes="[1, 5, 8, 10]"
+        :page-sizes="pageSizeList"
         :page-size="queryInfo.size"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total"
@@ -160,7 +160,7 @@
 export default {
   data () {
     // 验证邮箱的规则
-    var checkEmail = (rule, value, cb) => {
+    const checkEmail = (rule, value, cb) => {
       // 验证邮箱的正则表达式
       const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/
       if (regEmail.test(value)) {
@@ -189,7 +189,7 @@ export default {
         // 当前的页数
         page: 1,
         // 当前每页显示多少条数据
-        size: 8
+        size: 10
       },
       userList: [],
       total: 0,
@@ -234,11 +234,15 @@ export default {
       // 所有角色的数据列表
       rolesList: [],
       // 已选中的角色Id值
-      selectedRoleIds: ''
+      selectedRoleIds: '',
+      pageHeight: 0,
+      pageSizeList: [5, 8, 10, 20]
     }
   },
   created () {
+    this.pageHeight = `${document.documentElement.clientHeight}`
     this.getuserList()
+    console.log(this.pageHeight)
   },
   methods: {
 

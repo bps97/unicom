@@ -74,7 +74,6 @@
 </template>
 
 <script>
-const logTypes = ['无线', '传输', '数据', '大客户']
 
 export default {
   data () {
@@ -88,7 +87,7 @@ export default {
       total: 0,
       warehouseNames: {},
       recordList: undefined,
-      specialLines: logTypes,
+      specialLines: [],
       activeName: '1270283833125527553',
       logForm: {
         checkedspecialLine: []
@@ -98,14 +97,22 @@ export default {
   created () {
     this.listWarehouseNames()
     console.log(this.activeName)
+    this.listSpecialLine()
   },
   methods: {
     selectAll () {
       if (this.logForm.checkedspecialLine.length !== 4) {
-        this.logForm.checkedspecialLine = logTypes
+        this.logForm.checkedspecialLine = this.specialLines
       } else {
         this.logForm.checkedspecialLine = []
       }
+    },
+    async listSpecialLine () {
+      const { data: res } = await this.$http.get('category/specialLine')
+      if (res.status !== 200) {
+        return this.$message.error('获取专业线标签失败！')
+      }
+      this.specialLines = res.data.map(e => e.value)
     },
     tableRowClassName ({ row, column, rowIndex, columnIndex }) {
       if (columnIndex > 3 && columnIndex < 6) {
@@ -148,7 +155,7 @@ export default {
     },
     async searchLog () {
       console.log(this.logForm.checkedspecialLine)
-      const { data: res } = await this.$http.get('record', {
+      const { data: res } = await this.$http.get('record/tree', {
         params: {
           page: this.queryInfo.page,
           size: this.queryInfo.size,

@@ -25,16 +25,17 @@
           :name="item.key"
         />
         <!-- 表格 -->
-
         <el-table
           :data="categoryList"
           row-key="id"
           style="width: 100%;margin-bottom: 20px;"
           border
-          height="484"
+          :max-height="pageHeight-300"
           stripe
           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         >
+          <el-table-column label="展开" align="left" width="60px">
+          </el-table-column>
           <el-table-column prop="name" label="分类名称" sortable />
           <el-table-column label="类别等级" width="100px" align="center">
             <!-- 排序 -->
@@ -104,14 +105,14 @@
     <!-- 添加分类的对话框 -->
     <el-dialog
       title="添加分类"
-      :visible.sync="addCategorygoryDialogVisible"
+      :visible.sync="addCategoryDialogVisible"
       width="50%"
       @close="addCategorygoryDialogClosed"
     >
       <!-- 添加分类的表单 -->
       <el-form
-        :model="addCategorygoryFrom"
-        :rules="addCategorygoryFromRules"
+        :model="addCategoryFrom"
+        :rules="addCategoryFromRules"
         ref="addCategorygoryFromRef"
         label-width="100px"
       >
@@ -128,11 +129,11 @@
           />
         </el-form-item>
         <el-form-item label="分类名称：" prop="name">
-          <el-input v-model="addCategorygoryFrom.name" />
+          <el-input v-model="addCategoryFrom.name" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="addCategorygoryDialogVisible = false">取 消</el-button>
+        <el-button @click="addCategoryDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="addCategory">确 定</el-button>
       </span>
     </el-dialog>
@@ -148,22 +149,22 @@ export default {
         page: 1,
         size: 8
       },
-      activeName: '1271005839779250177',
+      activeName: '2c1016872b91dbac3c5b068d799cacee',
       // 商品分类的数据列表，默认为空
       categoryList: [],
       // 总数据条数
       total: 0,
       // 控制添加分类对话框的显示与隐藏
-      addCategorygoryDialogVisible: false,
+      addCategoryDialogVisible: false,
       // 添加分类的表单数据对象
-      addCategorygoryFrom: {
+      addCategoryFrom: {
         // 将要添加的分类的名称
         name: '',
         // 父级分类的Id
         parentId: 0
       },
       // 添加分类表单的验证规则对象
-      addCategorygoryFromRules: {
+      addCategoryFromRules: {
         name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
       },
       // 父级分类的列表
@@ -181,10 +182,13 @@ export default {
       editDialogVisible: false,
       // 查询到的分类信息对象
       editForm: {},
-      specialLineList: {}
+      specialLineList: {},
+      pageHeight: 0,
+      pageSizeList: [5, 8, 10, 20]
     }
   },
   created () {
+    this.pageHeight = `${document.documentElement.clientHeight}`
     this.listSpecialLine()
     this.listCategories()
   },
@@ -204,7 +208,7 @@ export default {
       // 先获取父级分类的数据列表
       this.listParentCategories()
       // 再展示出对话框
-      this.addCategorygoryDialogVisible = true
+      this.addCategoryDialogVisible = true
     },
 
     // 选择项发生变化触发这个函数
@@ -214,12 +218,12 @@ export default {
       // 反之，就说明没有选中任何父级分类
       if (this.selectedKeys.length > 0) {
         // 父级分类的Id
-        this.addCategorygoryFrom.parentId = this.selectedKeys[
+        this.addCategoryFrom.parentId = this.selectedKeys[
           this.selectedKeys.length - 1
         ]
       } else {
         // 父级分类的Id
-        this.addCategorygoryFrom.parentId = 0
+        this.addCategoryFrom.parentId = 0
       }
     },
 
@@ -227,7 +231,7 @@ export default {
     addCategorygoryDialogClosed () {
       this.$refs.addCategorygoryFromRef.resetFields()
       this.selectedKeys = []
-      this.addCategorygoryFrom.parentId = 0
+      this.addCategoryFrom.parentId = 0
     },
     // 切换标签
     shiftTabs () {
@@ -298,7 +302,7 @@ export default {
         if (!valid) return
         const { data: res } = await this.$http.post(
           'category/add',
-          this.addCategorygoryFrom
+          this.addCategoryFrom
         )
 
         if (res.status !== 201) {
@@ -307,7 +311,7 @@ export default {
 
         this.$message.success('添加分类成功！')
         this.listCategories()
-        this.addCategorygoryDialogVisible = false
+        this.addCategoryDialogVisible = false
       })
     },
     // 展示编辑分类的对话框

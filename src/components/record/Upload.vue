@@ -262,7 +262,7 @@ export default {
             // 提示修改成功
             this.$message.success('导入成功！')
           } else if (res.data.status === 500) {
-            this.$message.error(res.data.meta.message)
+            this.$message.error(res.data.message)
           }
           console.log(res.data)
           this.materialList = res.data.data.records
@@ -274,7 +274,7 @@ export default {
         })
         .catch(err => {
           console.log(err)
-          this.$message.error(err)
+          // this.$message.error(err)
           // this.$message.error('导入失败！')
           this.loading = false
         })
