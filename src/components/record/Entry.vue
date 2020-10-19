@@ -24,24 +24,18 @@
       >
         <el-tabs v-model="activeIndex" :tab-position="'left'" :before-leave="beforeTabLeave">
           <el-tab-pane label="物料信息" name="0" v-loading="loading">
+            <el-form-item label="所在仓库" >
+              <el-tag type="success" v-if="warehouseName !== ''">{{warehouseName}}</el-tag>
+            </el-form-item>
             <el-form-item label="物料情况" prop="status">
               <el-radio v-model="materialForm.status" label="正常">正常</el-radio>
               <el-radio v-model="materialForm.status" label="损坏">损坏</el-radio>
             </el-form-item>
-            <el-form-item label="仓库位置" prop="warehouse">
-              <el-select v-model="materialForm.warehouse" placeholder="请选择仓库">
-                <el-option
-                  v-for="item in warehouseNames"
-                  :key="item.key"
-                  :label="item.value"
-                  :value="item"
-                ></el-option>
-              </el-select>
-            </el-form-item>
+
             <el-form-item label="物料分类">
               <el-cascader
                 props.expandTrigger="hover"
-                :options="parentcateList"
+                :options="parentCategoryList"
                 :props="cascaderProps"
                 v-model="selectedKeys"
                 @change="parentCateChanged"
@@ -69,8 +63,8 @@
                   v-model="materialForm.count"
                   :show-tooltip="false"
                   :min="1"
+                  :max="300"
                   show-input
-                  max="300"
                 ></el-slider>
               </el-col>
             </el-form-item>
@@ -118,6 +112,18 @@
         </el-tabs>
       </el-form>
     </el-card>
+    <!-- 修改分类的对话框 -->
+    <el-dialog title="选择仓库" :visible.sync="warehouseDialogVisible" width="50%" center
+               :before-close="beforeClose"
+               @close="warehouseDialogVisible = false"  >
+      <el-radio
+        v-model="warehouseName"
+        v-for="item in warehouseList"
+        :key="item.id" :label="item.name"
+        @change="chooseWarehouse(item)"
+        border>
+      </el-radio>
+    </el-dialog>
   </div>
 </template>
 
@@ -125,10 +131,13 @@
 export default {
   data () {
     return {
+      warehouseDialogVisible: true,
+      warehouseList: undefined,
+      warehouseName: '',
+      warehouseId: '',
       materialForm: {
         materialId: '',
         materialName: '',
-        warehouse: [],
         categoryId: '',
         status: '正常',
         count: 1,
@@ -138,10 +147,9 @@ export default {
         message: '',
         type: '逐项入库'
       },
-      warehouseNames: [],
       applicationItemList: [],
-      materialnames: [],
-      parentcateList: [],
+      materialNames: [],
+      parentCategoryList: [],
       // 指定级联选择器的配置对象
       cascaderProps: {
         value: 'id',
@@ -159,9 +167,6 @@ export default {
         status: [
           { required: true, message: '请选择物料情况', trigger: 'change' }
         ],
-        warehouseId: [
-          { required: true, message: '请选择仓库位置', trigger: 'change' }
-        ],
         materialName: [
           { required: true, message: '请填写物料名称', trigger: 'change' }
         ]
@@ -170,16 +175,28 @@ export default {
     }
   },
   created () {
-    this.getParentcateList()
     this.listWarehouses()
+    this.listParentCategory()
   },
   methods: {
+    chooseWarehouse(item) {
+      this.warehouseDialogVisible = false
+      this.warehouseId = item.id
+    },
+    beforeClose(done) {
+      if (this.warehouseList !== null) {
+        const item = this.warehouseList[0]
+        this.warehouseName = item.name
+        this.warehouseId = item.id
+      }
+      done()
+    },
     querySearch (queryString, cb) {
-      var materialnames = this.materialnames
+      var materialnames = this.materialNames
       var results = queryString
         ? materialnames.filter(this.createFilter(queryString))
         : materialnames
-      // 调用 callback 返回建议列表的数据
+        // 调用 callback 返回建议列表的数据
       cb(results)
       console.log(this.materialForm)
     },
@@ -202,13 +219,13 @@ export default {
       }
     },
     // 获取父级分类
-    async getParentcateList () {
+    async listParentCategory () {
       const { data: res } = await this.$http.get('category/menus', {})
 
       if (res.status !== 200) {
         return this.$message.error('获取父级分类数据失败！')
       }
-      this.parentcateList = res.data
+      this.parentCategoryList = res.data
     },
     addToList () {
       // 验证表单
@@ -224,8 +241,8 @@ export default {
       const { data: res } = await this.$http.get('apply/material/check', {
         params: {
           materialName: this.materialForm.materialName,
-          warehouseId: this.materialForm.warehouse.key,
-          warehouseName: this.materialForm.warehouse.value,
+          warehouseId: this.warehouseId,
+          warehouseName: this.warehouseName,
           categoryId: this.materialForm.categoryId,
           specialLineId: this.materialForm.specialLineId,
           count: this.materialForm.count,
@@ -234,7 +251,7 @@ export default {
         }
       })
       if (res.status !== 200) {
-        return this.$message.error(res.meta.message)
+        return this.$message.error(res.message)
       }
       this.materialForm.materialId = res.data.id
       // 提交申请单
@@ -250,8 +267,8 @@ export default {
       const { data: res } = await this.$http.post('apply', {
         materialId: this.materialForm.materialId,
         materialName: this.materialForm.materialName,
-        warehouseId: this.materialForm.warehouse.key,
-        warehouseName: this.materialForm.warehouse.value,
+        warehouseId: this.warehouseId,
+        warehouseName: this.warehouseName,
         categoryId: this.materialForm.categoryId,
         specialLineId: this.materialForm.specialLineId,
         count: this.materialForm.count,
@@ -259,17 +276,17 @@ export default {
         type: this.materialForm.type
       })
       if (res.status !== 201) {
-        return this.$message.error(res.meta.message)
+        return this.$message.error(res.message)
       }
       this.resetForm('materialForm') // 清空表单
-      this.$message.success(res.meta.message)
+      this.$message.success(res.message)
     },
 
     // 获取物料名称
     async listMaterialNames () {
       const { data: res } = await this.$http.get('material/names', {
         params: {
-          warehouseId: this.materialForm.warehouse.key,
+          warehouseId: this.warehouseId,
           categoryId: this.materialForm.categoryId,
           status: this.materialForm.status
         }
@@ -278,16 +295,16 @@ export default {
       if (res.status !== 200) {
         return this.$message.error('获取商品列表失败！')
       }
-      this.materialnames = res.data
+      this.materialNames = res.data
     },
     // 获取仓库列表
     async listWarehouses () {
-      const { data: res } = await this.$http.get('warehouse/names')
+      const { data: res } = await this.$http.get('warehouse/list')
 
       if (res.status !== 200) {
-        return this.$message.error('获取仓库列表失败！' + res.meta.message)
+        return this.$message.error('获取仓库列表失败！' + res.message)
       }
-      this.warehouseNames = res.data
+      this.warehouseList = res.data
     },
     // 获取申请单项
     async listApplicationItems () {
@@ -298,7 +315,7 @@ export default {
       })
 
       if (res.status !== 200) {
-        return this.$message.error('获取申请单列表失败！' + res.meta.message)
+        return this.$message.error('获取申请单列表失败！' + res.message)
       }
       this.applicationItemList = res.data
       return this.applicationItemList
@@ -338,7 +355,7 @@ export default {
     async submitApplication () {
       const { data: res } = await this.$http.put('apply/message', this.applicationForm)
       if (res.status !== 200) {
-        return this.$message.error('提交申请失败！' + res.meta.message)
+        return this.$message.error('提交申请失败！' + res.message)
       }
       this.$message.success('申请成功!')
       this.activeIndex = '0'

@@ -42,7 +42,7 @@
             <template slot-scope="scope">
               <el-tag size="mini" v-if="scope.row.level===1">一级</el-tag>
               <el-tag type="success" size="mini" v-else-if="scope.row.level===2">二级</el-tag>
-              <el-tag type="warning" size="mini" v-else>三级</el-tag>
+              <el-tag type="warning" size="mini" v-else-if="scope.row.level===3">三级</el-tag>
             </template>
           </el-table-column>
           <el-table-column label="有效性" width="66px">
@@ -107,7 +107,7 @@
       title="添加分类"
       :visible.sync="addCategoryDialogVisible"
       width="50%"
-      @close="addCategorygoryDialogClosed"
+      @close="addCategoryDialogClosed"
     >
       <!-- 添加分类的表单 -->
       <el-form
@@ -228,7 +228,7 @@ export default {
     },
 
     // 监听对话框的关闭事件，重置表单数据
-    addCategorygoryDialogClosed () {
+    addCategoryDialogClosed () {
       this.$refs.addCategorygoryFromRef.resetFields()
       this.selectedKeys = []
       this.addCategoryFrom.parentId = 0
@@ -310,8 +310,9 @@ export default {
         }
 
         this.$message.success('添加分类成功！')
-        this.listCategories()
-        this.addCategoryDialogVisible = false
+        this.listCategories().then(() => {
+          this.addCategoryDialogVisible = false
+        })
       })
     },
     // 展示编辑分类的对话框

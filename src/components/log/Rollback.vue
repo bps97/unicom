@@ -28,15 +28,26 @@
           <el-table-column label="申请用户" sortable width="100" prop="userName" />
           <el-table-column label="出入库情况" prop="message" />
           <el-table-column label="工单时间" sortable align="center" prop="createTime"/>
+<!--          <el-table-column label="是否有效" width="66px">-->
+<!--            &lt;!&ndash; 是否有效 &ndash;&gt;-->
+<!--            <template slot-scope="scope">-->
+<!--              <el-switch v-model="scope.row.available" @change="closeAvailable(scope.row)" disabled/>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
           <el-table-column label="操作" width="200px" align="center">
             <!-- 操作 -->
             <template slot-scope="scope">
               <el-button
-                type="primary"
-                icon="el-icon-refresh-right"
+                type="warning"
                 size="mini"
-                @click="showEditDialog(scope.row.id)"
+                @click="rollbackRecord(scope.row.id)"
+                v-if="scope.row.available"
               >回滚</el-button>
+              <el-button v-else
+                         type="info"
+                         size="mini"
+                         disabled
+              >无效</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -85,6 +96,15 @@ export default {
     this.searchLog()
   },
   methods: {
+
+    async rollbackRecord (id) {
+      const { data: res } = await this.$http.get(`record/${id}/rollback`)
+      if (res.status !== 200) {
+        this.recordList = undefined
+        return this.$message.error(res.message)
+      }
+      this.$message.success(res.message)
+    },
     // 切换标签
     shiftTabs () {
     },
@@ -118,7 +138,7 @@ export default {
 
       if (res.status !== 200) {
         this.recordList = undefined
-        return this.$message.error(res.meta.message)
+        return this.$message.error(res.message)
       }
 
       this.recordList = res.data.records

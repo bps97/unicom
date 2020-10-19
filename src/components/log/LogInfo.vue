@@ -54,7 +54,7 @@
           </el-table-column>
           <el-table-column label="物料数量" prop="count" width="80" />
           <el-table-column label="分类类型" prop="categoryName" />
-          <el-table-column label="工单时间" sortable align="center" prop="createTime" width="100" />
+          <el-table-column label="工单时间" sortable align="center" prop="createTime"  />
         </el-table>
       </el-row>
 

@@ -23,19 +23,12 @@
       >
         <el-tabs v-model="activeIndex" :tab-position="'left'" :before-leave="beforeTabLeave">
           <el-tab-pane label="物料信息" name="0">
+            <el-form-item label="所在仓库" >
+              <el-tag type="success" v-if="warehouseName !== ''">{{warehouseName}}</el-tag>
+            </el-form-item>
             <el-form-item label="物料情况" prop="status">
               <el-radio v-model="materialForm.status" label="正常">正常</el-radio>
               <el-radio v-model="materialForm.status" label="损坏">损坏</el-radio>
-            </el-form-item>
-            <el-form-item label="仓库位置" prop="warehouse">
-              <el-select v-model="materialForm.warehouse" placeholder="请选择仓库" value-key="key">
-                <el-option
-                  v-for="item in warehouseNames"
-                  :key="item.key"
-                  :label="item.value"
-                  :value="item"
-                ></el-option>
-              </el-select>
             </el-form-item>
             <el-form-item label="物料分类">
               <el-cascader
@@ -125,6 +118,17 @@
         </el-tabs>
       </el-form>
     </el-card>
+    <el-dialog title="选择仓库" :visible.sync="warehouseDialogVisible" width="50%" center
+               :before-close="beforeClose"
+               @close="warehouseDialogVisible = false"  >
+      <el-radio
+        v-model="warehouseName"
+        v-for="item in warehouseList"
+        :key="item.id" :label="item.name"
+        @change="chooseWarehouse(item)"
+        border>
+      </el-radio>
+    </el-dialog>
   </div>
 </template>
 
@@ -132,6 +136,10 @@
 export default {
   data () {
     return {
+      warehouseDialogVisible: true,
+      warehouseList: undefined,
+      warehouseName: '',
+      warehouseId: '',
       materialForm: {
         material: '',
         warehouse: '',
@@ -179,7 +187,18 @@ export default {
     this.listWarehouses()
   },
   methods: {
-
+    chooseWarehouse(item) {
+      this.warehouseDialogVisible = false
+      this.warehouseId = item.id
+    },
+    beforeClose(done) {
+      if (this.warehouseList !== null) {
+        const item = this.warehouseList[0]
+        this.warehouseName = item.name
+        this.warehouseId = item.id
+      }
+      done()
+    },
     changeMaterialOption (item) {
       this.maxCount = item.count
     },
@@ -222,8 +241,8 @@ export default {
       const { data: res } = await this.$http.post('apply', {
         materialName: this.materialForm.material.name,
         materialId: this.materialForm.material.id,
-        warehouseId: this.materialForm.warehouse.key,
-        warehouseName: this.materialForm.warehouse.value,
+        warehouseId: this.warehouseId,
+        warehouseName: this.warehouseName,
         categoryId: this.materialForm.categoryId,
         specialLineId: this.materialForm.specialLineId,
         count: this.materialForm.count,
@@ -254,7 +273,7 @@ export default {
     async listMaterialOptions () {
       const { data: res } = await this.$http.get('material/options', {
         params: {
-          warehouseId: this.materialForm.warehouse.key,
+          warehouseId: this.warehouseId,
           categoryId: this.materialForm.categoryId,
           status: this.materialForm.status
         }
@@ -266,13 +285,12 @@ export default {
     },
     // 获取仓库列表
     async listWarehouses () {
-      const { data: res } = await this.$http.get('warehouse/names')
+      const { data: res } = await this.$http.get('warehouse/list')
 
       if (res.status !== 200) {
-        return this.$message.error('获取仓库列表失败！')
+        return this.$message.error('获取仓库列表失败！' + res.message)
       }
-
-      this.warehouseNames = res.data
+      this.warehouseList = res.data
     },
     // 获取申请单项
     async listItems () {
